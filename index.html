@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tạo thiệp mời Beauty Summit 2025</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:100,300,400,700,900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="container">
+        <!-- Left side - Form -->
+        <div class="left-panel">
+            <div class="logo">
+                <img src="image/logos.png" alt="Beauty Summit Logo">
+            </div>
+            
+            <div class="form-container">
+                <h2>TẠO THIỆP MỜI</h2>
+                
+                <div class="form-group">
+                    <label>Tên hiển thị trên thiệp mời</label>
+                    <input type="text" id="guestName" placeholder="Nhập họ và tên" class="form-input">
+                </div>
+                
+                <div class="form-group">
+                    <label>Chức danh trên thiệp mời</label>
+                    <input type="text" id="guestTitle" placeholder="Nhập chức danh" class="form-input">
+                </div>
+                
+                <div class="form-group">
+                    <label>Chọn hạng vé</label>
+                    <select id="ticketType" class="form-input">
+                        <option value="Silver">AI E-COMMERCE REVOLUTION SILVER</option>
+                        <option value="Gold">AI E-COMMERCE REVOLUTION GOLD</option>
+                        <option value="Diamond">AI E-COMMERCE REVOLUTION DIAMOND</option>
+                        <option value="V.VIP">V.VIP</option>
+                    </select>
+                </div>
+                
+                <button id="generateInvitation" class="generate-btn">Chỉnh sửa ảnh</button>
+            </div>
+        </div>
+        
+        <!-- Right side - Canvas Preview -->
+        <div class="right-panel">
+            <div class="canvas-container">
+                <canvas id="invitationCanvas" width="800" height="600"></canvas>
+                
+                <div class="canvas-controls">
+                    <div class="photo-controls" id="photoControls" style="display: none;">
+                        <h4>Điều chỉnh ảnh</h4>
+                        <p>Để điều chỉnh ảnh, hãy nhấn "Chỉnh sửa ảnh" để mở modal chỉnh sửa</p>
+                        <button id="editPhotoBtn" class="edit-btn">Chỉnh sửa ảnh</button>
+                    </div>
+                </div>
+                
+                <div class="info-box">
+                    <h3>AI E-COMMERCE REVOLUTION</h3>
+                    <ul>
+                        <li>🎯 Sự kiện công nghệ AI và E-commerce lớn nhất năm</li>
+                        <li>📅 Diễn ra từ ngày 29-30.08.2025 tại SECC</li>
+                        <li>🎤 Các diễn giả hàng đầu chia sẻ kinh nghiệm</li>
+                        <li>🤝 Cơ hội kết nối và học hỏi</li>
+                        <li>🎁 Nhiều quà tặng hấp dẫn</li>
+                    </ul>
+                    <div class="contact-info">
+                        <span>📞 0345.811.456 - 0789.282.979 </span>
+                    </div>
+                </div>
+            </div>
+            
+            <button id="downloadInvitation" class="download-btn">Tải thiệp mời</button>
+            
+            <!-- Instructions Modal -->
+            <button id="showInstructions" class="instructions-btn">Hướng dẫn tạo thiệp mời</button>
+            
+            <div class="footer-info">
+                <p>Bản quyền thuộc về TukiGroup</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modals -->
+    <!-- Welcome Instructions Modal -->
+    <div id="welcomeModal" class="modal welcome-modal" style="display: none;">
+        <div class="modal-content welcome-modal-content">
+            <span class="close" id="closeWelcomeModal">&times;</span>
+            <h2>Hướng dẫn tạo thiệp mời sự kiện!</h2>
+            
+            <div class="welcome-content">
+                <div class="frame-preview">
+                    <img src="image/frameEventChiBinh.jpg" alt="Thiệp mời mẫu" class="frame-image">
+                </div>
+                
+                <div class="instruction-steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <p>Điền thông tin và tải ảnh bản thân lên.</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <p>Điều chỉnh vị trí và kích thước ảnh theo ý muốn.</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <p>Nhấn tải thiệp mời về máy.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Photo Upload Modal -->
+    <div id="photoModal" class="modal" style="display: none;">
+        <div class="modal-content photo-modal">
+            <span class="close">&times;</span>
+            <h2>Chọn ảnh đại diện</h2>
+            <div class="photo-upload-area">
+                <input type="file" id="photoInput" accept="image/*" style="display: none;">
+                <button id="uploadPhotoBtn" class="upload-btn">Tải ảnh lên</button>
+                <div id="photoPreview" class="photo-preview" style="display: none;">
+                    <canvas id="cropCanvas" width="300" height="300"></canvas>
+                    <div class="crop-controls">
+                        <p>Dùng thanh cuộn để thu phóng ảnh và kéo ảnh tới vị trí bạn muốn</p>
+                        <input type="range" id="scaleSlider" min="0.5" max="3" step="0.1" value="1">
+                        <div class="crop-buttons">
+                            <button id="resetCrop" class="reset-btn">Đặt lại</button>
+                            <button id="cancelCrop" class="cancel-btn">Hủy</button>
+                            <button id="saveCrop" class="save-btn">Lưu</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>

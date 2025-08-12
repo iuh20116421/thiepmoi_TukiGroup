@@ -1,0 +1,959 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background: linear-gradient(135deg, #a9dbff 0%, #87ebff 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+#container {
+    display: flex;
+    max-width: 1400px;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    min-height: 700px;
+}
+
+/* Left Panel */
+.left-panel {
+    flex: 1;
+    background: linear-gradient(135deg, #8020d9 0%, #c152e9 50%, #186af7 100%);
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: white;
+}
+
+.logo img {
+    max-width: 200px;
+    margin-bottom: 40px;
+}
+
+.form-container {
+    width: 100%;
+    max-width: 400px;
+}
+
+.form-container h2 {
+    font-size: 28px;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 40px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.form-group {
+    margin-bottom: 30px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 400;
+    font-size: 16px;
+}
+
+.form-input {
+    width: 100%;
+    padding: 15px 20px;
+    border: none;
+    border-radius: 25px;
+    font-size: 16px;
+    background: rgba(255, 255, 255, 0.9);
+    color: #333;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.form-input:focus {
+    background: white;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.form-input::placeholder {
+    color: #999;
+}
+
+.generate-btn {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(45deg, #e91e63, #ff6b9d);
+    color: white;
+    border: none;
+    border-radius: 25px;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 20px;
+}
+
+.generate-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 15px rgba(233, 30, 99, 0.3);
+    background: linear-gradient(45deg, #ff6b9d, #e91e63);
+    transition: all 0.3s ease;
+}
+
+/* Right Panel */
+.right-panel {
+    flex: 2;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.info-box {
+    background: linear-gradient(135deg, #8020d9 0%, #c152e9 50%, #186af7 100%);
+    color: white;
+    padding: 25px;
+    border-radius: 15px;
+    margin-top: 20px;
+    max-width: 800px;
+}
+
+.info-box h3 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.info-box ul {
+    list-style: none;
+    margin-bottom: 20px;
+    margin-left: 0;
+    margin-right: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+    width: 100%;
+}
+
+.info-box li {
+    padding: 8px 12px;
+    font-size: 14px;
+    line-height: 1.5;
+    position: relative;
+    padding-left: 30px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    width: 90%;
+    max-width: 600px;
+    text-align: left;
+}
+
+.info-box li:before {
+    content: "★";
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #ffd700;
+    font-size: 16px;
+}
+
+.info-box li:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateX(5px);
+}
+
+.contact-info {
+    text-align: center;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 10px;
+    border-radius: 10px;
+    font-weight: 600;
+}
+
+.download-btn {
+    background: linear-gradient(45deg, #e91e63, #ff6b9d);
+    color: white;
+    border: none;
+    padding: 15px 40px;
+    border-radius: 25px;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+}
+
+.download-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(233, 30, 99, 0.4);
+}
+
+.instructions-btn {
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 20px;
+}
+
+.instructions-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+}
+
+/* Photo Upload Styles */
+.photo-upload {
+    margin-top: 20px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+}
+
+.photo-upload h3 {
+    color: white;
+    margin-bottom: 15px;
+    font-size: 18px;
+}
+
+.upload-btn {
+    background: linear-gradient(45deg, #FF6B6B, #FF8E53);
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 15px;
+}
+
+.upload-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(255, 107, 107, 0.4);
+}
+
+.photo-preview {
+    padding: 15px;
+    border-radius: 10px;
+    margin-top: 10px;
+}
+
+#cropCanvas {
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    display: block;
+    margin: 0 auto 15px;
+}
+
+.crop-controls p {
+    color: #666;
+    font-size: 12px;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+#scaleSlider {
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+.crop-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.cancel-btn, .save-btn {
+    padding: 8px 20px;
+    border: none;
+    border-radius: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.cancel-btn {
+    background: #f44336;
+    color: white;
+}
+
+.save-btn {
+    background: #4CAF50;
+    color: white;
+}
+
+.cancel-btn:hover, .save-btn:hover {
+    transform: translateY(-2px);
+}
+
+/* Modal Styles */
+.modal {
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    background: white;
+    margin: 5% auto;
+    padding: 30px;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+    animation: modalSlideIn 0.3s ease-out;
+}
+
+.photo-modal {
+    max-width: 500px;
+    text-align: center;
+}
+
+.photo-upload-area {
+    padding: 20px;
+}
+
+.upload-btn {
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 25px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 20px;
+    display: inline-block;
+}
+
+.upload-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+}
+
+.photo-preview {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 15px;
+    margin-top: 15px;
+}
+
+#cropCanvas {
+    border: 2px solid #ddd;
+    border-radius: 50%;
+    display: block;
+    margin: 0 auto 20px;
+    background: #fff;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.crop-controls p {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 15px;
+    text-align: center;
+    line-height: 1.5;
+}
+
+#scaleSlider {
+    width: 100%;
+    margin-bottom: 20px;
+    height: 6px;
+    border-radius: 3px;
+    background: #ddd;
+    outline: none;
+    -webkit-appearance: none;
+}
+
+#scaleSlider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+#scaleSlider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.crop-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.cancel-btn, .save-btn {
+    padding: 12px 30px;
+    border: none;
+    border-radius: 25px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 14px;
+}
+
+.cancel-btn {
+    background: #f44336;
+    color: white;
+}
+
+.save-btn {
+    background: linear-gradient(45deg, #e91e63, #ff6b9d);
+    color: white;
+}
+
+.reset-btn {
+    background: linear-gradient(45deg, #ff9800, #ff5722);
+    color: white;
+}
+
+.cancel-btn:hover, .save-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.close {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #999;
+    transition: color 0.3s;
+}
+
+.close:hover {
+    color: #333;
+}
+
+.instruction-steps {
+    margin-top: 20px;
+}
+
+.step {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 8px;
+    background: #f8f9fa;
+    border-radius: 10px;
+}
+
+.step-number {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(45deg, #e91e63, #ff6b9d);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin-right: 15px;
+    flex-shrink: 0;
+}
+
+.step p {
+    margin: 0;
+    color: #333;
+    font-size: 16px;
+}
+
+.photo-upload-area {
+    text-align: center;
+    padding: 20px;
+}
+
+.photo-preview-modal {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 15px;
+}
+
+#cropCanvasModal {
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    display: block;
+    margin: 0 auto 15px;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Welcome Modal Styles */
+.welcome-modal {
+    background-color: rgba(232, 244, 255, 0.9);
+    z-index: 9999;
+}
+
+.welcome-modal-content {
+    max-width: 900px;
+    padding: 30px;
+    background: #f8f9fa;
+}
+
+.welcome-modal-content h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 30px;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.welcome-content {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+}
+
+.frame-preview {
+    flex: 2;
+    text-align: center;
+}
+
+.frame-image {
+    width: 100%;
+    max-width: 500px;
+    height: auto;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    border: 3px solid #fff;
+}
+
+.welcome-content .instruction-steps {
+    flex: 1.5;
+    margin-top: 120px;
+}
+
+.welcome-content .step {
+    margin-bottom: 25px;
+    background: #fff;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    border-left: 5px solid #921ee9;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.welcome-content .step:hover {
+    transform: translateX(5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    background: linear-gradient(135deg, #fef7ff 0%, #fee0ff 50%, #78c5f2 100%);
+    border-left: 5px solid #a171f3;
+}
+
+.welcome-content .step::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    transition: left 0.5s ease;
+}
+
+.welcome-content .step:hover::before {
+    left: 100%;
+}
+
+.welcome-content .step:hover {
+    transform: translateX(5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.welcome-content .step-number {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(45deg, #ae0000, #0c00b0);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin-right: 20px;
+    flex-shrink: 0;
+    font-size: 20px;
+    position: relative;
+    z-index: 1;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.welcome-content .step:hover .step-number {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.welcome-content .step p {
+    margin: 0;
+    color: #333;
+    font-size: 18px;
+    line-height: 1.5;
+    position: relative;
+    z-index: 1;
+    transition: all 0.3s ease;
+}
+
+.welcome-content .step:hover p {
+    color: #e91e63;
+    font-weight: 500;
+}
+
+/* Close button for welcome modal */
+#closeWelcomeModal {
+    position: absolute;
+    right: 25px;
+    top: 25px;
+    font-size: 35px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #666;
+    transition: color 0.3s;
+    background: rgba(255, 255, 255, 0.8);
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#closeWelcomeModal:hover {
+    color: #e91e63;
+    background: rgba(255, 255, 255, 1);
+}
+
+/* Responsive for welcome modal */
+@media (max-width: 768px) {
+    .welcome-content {
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .welcome-modal-content {
+        margin: 2% auto;
+        max-width: 95%;
+        padding: 20px;
+    }
+    
+    .welcome-content .step p {
+        font-size: 16px;
+    }
+    
+    .welcome-modal-content h2 {
+        font-size: 24px;
+    }
+}
+
+.footer-info {
+    text-align: center;
+    color: #666;
+    font-size: 14px;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    #container {
+        flex-direction: column;
+        max-width: 800px;
+    }
+    
+    .left-panel,
+    .right-panel {
+        flex: none;
+    }
+    
+    .left-panel {
+        padding: 30px;
+    }
+    
+    .right-panel {
+        padding: 30px;
+    }
+    
+    #invitationCanvas {
+        width: 100%;
+        max-width: 600px;
+    }
+}
+
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+    
+    .left-panel {
+        padding: 20px;
+    }
+    
+    .right-panel {
+        padding: 20px;
+    }
+    
+    .form-container h2 {
+        font-size: 24px;
+        margin-bottom: 30px;
+    }
+    
+    .info-box {
+        max-width: 100%;
+    }
+}
+
+/* Animation for form inputs */
+.form-input {
+    animation: slideInLeft 0.6s ease-out;
+}
+
+.generate-btn {
+    animation: slideInUp 0.8s ease-out;
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Canvas container styling */
+.canvas-container {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 30px;
+}
+
+.canvas-container::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    right: -10px;
+    bottom: -10px;
+    background: linear-gradient(45deg, #e91e63, #ff6b9d, #667eea, #764ba2);
+    border-radius: 20px;
+    z-index: -1;
+    opacity: 0.3;
+}
+
+#invitationCanvas {
+    border-radius: 15px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+.canvas-controls {
+    margin-top: 20px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.photo-controls {
+    text-align: center;
+}
+
+.photo-controls h4 {
+    color: #333;
+    margin-bottom: 15px;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.control-group {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 10px;
+    border: 1px solid #e0e0e0;
+}
+
+.control-group label {
+    font-weight: 500;
+    color: #333;
+    min-width: 80px;
+    text-align: left;
+}
+
+.control-group input[type="range"] {
+    flex: 1;
+    margin: 0 15px;
+    height: 6px;
+    border-radius: 3px;
+    background: #ddd;
+    outline: none;
+    -webkit-appearance: none;
+}
+
+.control-group input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, #e91e63, #ff6b9d);
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.control-group input[type="range"]::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, #e91e63, #ff6b9d);
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.control-group span {
+    font-weight: 600;
+    color: #e91e63;
+    min-width: 40px;
+    text-align: right;
+}
+
+.reset-btn {
+    background: linear-gradient(45deg, #ff9800, #ff5722);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+}
+
+.reset-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 152, 0, 0.3);
+}
+
+.edit-btn {
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+}
+
+.edit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+}
+
+/* Remove old invitation-container styles */
+.invitation-container {
+    display: none;
+}
+
+/* Responsive adjustments for canvas */
+@media (max-width: 1024px) {
+    .canvas-container {
+        text-align: center;
+    }
+    
+    #invitationCanvas {
+        max-width: 100%;
+        height: auto;
+    }
+    
+    .control-group {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+    
+    .control-group label {
+        text-align: center;
+        min-width: auto;
+    }
+    
+    .control-group span {
+        text-align: center;
+        min-width: auto;
+    }
+}
