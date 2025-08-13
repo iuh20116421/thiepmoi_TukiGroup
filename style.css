@@ -220,6 +220,17 @@ body {
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
+.form-input:invalid {
+    border: 1px solid #8e47f7
+    animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
 .form-input::placeholder {
     color: #999;
 }
@@ -394,6 +405,7 @@ body {
 }
 
 .photo-preview {
+    background: white;
     padding: 15px;
     border-radius: 10px;
     margin-top: 10px;
@@ -421,30 +433,39 @@ body {
 .crop-buttons {
     display: flex;
     justify-content: center;
-    gap: 10px;
+    gap: 15px;
 }
 
-.cancel-btn, .save-btn {
-    padding: 8px 20px;
+.reset-btn, .cancel-btn, .save-btn {
+    padding: 12px 30px;
     border: none;
-    border-radius: 15px;
+    border-radius: 25px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
+    font-size: 14px;
+    min-width: 100px;
+    text-align: center;
+}
+
+.reset-btn {
+    background: linear-gradient(45deg, #ff9800, #ff5722);
+    color: white;
 }
 
 .cancel-btn {
-    background: #f44336;
+    background: linear-gradient(45deg, #9f0707, #fa3126);
     color: white;
 }
 
 .save-btn {
-    background: #4CAF50;
+    background: linear-gradient(45deg, #04a91f, #2fe95d);
     color: white;
 }
 
-.cancel-btn:hover, .save-btn:hover {
+.reset-btn:hover, .cancel-btn:hover, .save-btn:hover {
     transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 /* Kiểu dáng cho modal */
@@ -484,7 +505,7 @@ body {
 }
 
 .upload-btn {
-    background: linear-gradient(45deg, #667eea, #764ba2);
+    background: linear-gradient(55deg, #bd0000, #0401be);
     color: white;
     border: none;
     padding: 15px 30px;
@@ -562,41 +583,7 @@ body {
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
-.crop-buttons {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-}
 
-.cancel-btn, .save-btn {
-    padding: 12px 30px;
-    border: none;
-    border-radius: 25px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 14px;
-}
-
-.cancel-btn {
-    background: #f44336;
-    color: white;
-}
-
-.save-btn {
-    background: linear-gradient(45deg, #e91e63, #ff6b9d);
-    color: white;
-}
-
-.reset-btn {
-    background: linear-gradient(45deg, #ff9800, #ff5722);
-    color: white;
-}
-
-.cancel-btn:hover, .save-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-}
 
 .close {
     position: absolute;
@@ -1082,23 +1069,7 @@ body {
     text-align: right;
 }
 
-.reset-btn {
-    background: linear-gradient(45deg, #ff9800, #ff5722);
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 20px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    margin-top: 10px;
-}
 
-.reset-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(255, 152, 0, 0.3);
-}
 
 /* đã xoá style cho nút edit theo yêu cầu */
 

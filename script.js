@@ -3,7 +3,6 @@ class InvitationGenerator {
         this.canvas = document.getElementById('invitationCanvas');
         this.ctx = this.canvas.getContext('2d');
         this.guestNameInput = document.getElementById('guestName');
-        this.guestTitleInput = document.getElementById('guestTitle');
         this.ticketTypeSelect = document.getElementById('ticketType');
         this.photoInput = document.getElementById('photoInput');
         this.generateBtn = document.getElementById('generateInvitation');
@@ -89,10 +88,22 @@ class InvitationGenerator {
     setupEventListeners() {
         // Sự kiện của biểu mẫu
         this.generateBtn.addEventListener('click', () => {
+            // Kiểm tra trường bắt buộc
+            if (!this.guestNameInput.value.trim()) {
+                this.showNotification('Vui lòng nhập tên hiển thị trên thiệp mời!', 'error');
+                this.guestNameInput.focus();
+                return;
+            }
             this.openPhotoModal();
         });
         
         this.downloadBtn.addEventListener('click', () => {
+            // Kiểm tra trường bắt buộc
+            if (!this.guestNameInput.value.trim()) {
+                this.showNotification('Vui lòng nhập tên hiển thị trên thiệp mời!', 'error');
+                this.guestNameInput.focus();
+                return;
+            }
             this.downloadInvitation();
         });
         
@@ -147,9 +158,7 @@ class InvitationGenerator {
             this.generateInvitation();
         });
         
-        this.guestTitleInput.addEventListener('input', () => {
-            this.generateInvitation();
-        });
+
         
         this.ticketTypeSelect.addEventListener('change', () => {
             this.generateInvitation();
@@ -456,44 +465,46 @@ class InvitationGenerator {
         // Draw glowing blue border effect for saved photo
         finalCtx.save();
         
-        // Create outer glow effect (multiple layers for realistic glow)
-        const glowLayers = [
-            { radius: radius + 15, alpha: 0.1, color: '#00BFFF' },
-            { radius: radius + 10, alpha: 0.2, color: '#00BFFF' },
-            { radius: radius + 5, alpha: 0.3, color: '#00BFFF' },
-            { radius: radius + 2, alpha: 0.5, color: '#00BFFF' }
-        ];
-        
-        // Draw glow layers from outer to inner
-        glowLayers.forEach(layer => {
-            finalCtx.shadowColor = layer.color;
-            finalCtx.shadowBlur = 20;
-            finalCtx.shadowOffsetX = 0;
-            finalCtx.shadowOffsetY = 0;
-            
-            finalCtx.fillStyle = `rgba(0, 191, 255, ${layer.alpha})`;
-            finalCtx.beginPath();
-            finalCtx.arc(centerX, centerY, layer.radius, 0, Math.PI * 2);
-            finalCtx.fill();
-        });
-        
-        // Reset shadow for the main circle
-        finalCtx.shadowColor = 'transparent';
-        finalCtx.shadowBlur = 0;
-        
-        // Draw the main glowing border
-        finalCtx.strokeStyle = '#00BFFF';
-        finalCtx.lineWidth = 4;
-        finalCtx.beginPath();
-        finalCtx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-        finalCtx.stroke();
-        
-        // Add inner glow effect
-        finalCtx.strokeStyle = 'rgba(0, 191, 255, 0.6)';
-        finalCtx.lineWidth = 2;
-        finalCtx.beginPath();
-        finalCtx.arc(centerX, centerY, radius - 2, 0, Math.PI * 2);
-        finalCtx.stroke();
+                 // Tạo hiệu ứng viền sáng xanh neon như trong ảnh mẫu
+         const glowLayers = [
+             { radius: radius + 20, alpha: 0.05, color: '#00BFFF' },
+             { radius: radius + 15, alpha: 0.1, color: '#00BFFF' },
+             { radius: radius + 10, alpha: 0.15, color: '#00BFFF' },
+             { radius: radius + 6, alpha: 0.2, color: '#00BFFF' },
+             { radius: radius + 3, alpha: 0.3, color: '#00BFFF' },
+             { radius: radius + 1, alpha: 0.4, color: '#00BFFF' }
+         ];
+         
+         // Vẽ các lớp sáng từ ngoài vào trong để tạo hiệu ứng glow mềm mại
+         glowLayers.forEach(layer => {
+             finalCtx.shadowColor = layer.color;
+             finalCtx.shadowBlur = 25;
+             finalCtx.shadowOffsetX = 0;
+             finalCtx.shadowOffsetY = 0;
+             
+             finalCtx.fillStyle = `rgba(0, 191, 255, ${layer.alpha})`;
+             finalCtx.beginPath();
+             finalCtx.arc(centerX, centerY, layer.radius, 0, Math.PI * 2);
+             finalCtx.fill();
+         });
+         
+         // Xoá shadow cho vòng tròn chính
+         finalCtx.shadowColor = 'transparent';
+         finalCtx.shadowBlur = 0;
+         
+         // Vẽ viền sáng chính với độ dày vừa phải
+         finalCtx.strokeStyle = '#00BFFF';
+         finalCtx.lineWidth = 3;
+         finalCtx.beginPath();
+         finalCtx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+         finalCtx.stroke();
+         
+         // Thêm viền sáng bên trong để tăng độ sâu
+         finalCtx.strokeStyle = 'rgba(0, 191, 255, 0.7)';
+         finalCtx.lineWidth = 1.5;
+         finalCtx.beginPath();
+         finalCtx.arc(centerX, centerY, radius - 1, 0, Math.PI * 2);
+         finalCtx.stroke();
         
         finalCtx.restore();
         
@@ -649,44 +660,46 @@ class InvitationGenerator {
             // Draw glowing blue border effect for uploaded avatar
             ctx.save();
             
-            // Create outer glow effect (multiple layers for realistic glow)
-            const glowLayers = [
-                { radius: circleRadius + 15, alpha: 0.1, color: '#00BFFF' },
-                { radius: circleRadius + 10, alpha: 0.2, color: '#00BFFF' },
-                { radius: circleRadius + 5, alpha: 0.3, color: '#00BFFF' },
-                { radius: circleRadius + 2, alpha: 0.5, color: '#00BFFF' }
-            ];
-            
-            // Draw glow layers from outer to inner
-            glowLayers.forEach(layer => {
-                ctx.shadowColor = layer.color;
-                ctx.shadowBlur = 20;
-                ctx.shadowOffsetX = 0;
-                ctx.shadowOffsetY = 0;
-                
-                ctx.fillStyle = `rgba(0, 191, 255, ${layer.alpha})`;
-                ctx.beginPath();
-                ctx.arc(circleX, circleY, layer.radius, 0, Math.PI * 2);
-                ctx.fill();
-            });
-            
-            // Reset shadow for the main circle
-            ctx.shadowColor = 'transparent';
-            ctx.shadowBlur = 0;
-            
-            // Draw the main glowing border
-            ctx.strokeStyle = '#00BFFF';
-            ctx.lineWidth = 4;
-            ctx.beginPath();
-            ctx.arc(circleX, circleY, circleRadius, 0, Math.PI * 2);
-            ctx.stroke();
-            
-            // Add inner glow effect
-            ctx.strokeStyle = 'rgba(0, 191, 255, 0.6)';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.arc(circleX, circleY, circleRadius - 2, 0, Math.PI * 2);
-            ctx.stroke();
+                         // Tạo hiệu ứng viền sáng xanh neon như trong ảnh mẫu
+             const glowLayers = [
+                 { radius: circleRadius + 20, alpha: 0.05, color: '#00BFFF' },
+                 { radius: circleRadius + 15, alpha: 0.1, color: '#00BFFF' },
+                 { radius: circleRadius + 10, alpha: 0.15, color: '#00BFFF' },
+                 { radius: circleRadius + 6, alpha: 0.2, color: '#00BFFF' },
+                 { radius: circleRadius + 3, alpha: 0.3, color: '#00BFFF' },
+                 { radius: circleRadius + 1, alpha: 0.4, color: '#00BFFF' }
+             ];
+             
+             // Vẽ các lớp sáng từ ngoài vào trong để tạo hiệu ứng glow mềm mại
+             glowLayers.forEach(layer => {
+                 ctx.shadowColor = layer.color;
+                 ctx.shadowBlur = 25;
+                 ctx.shadowOffsetX = 0;
+                 ctx.shadowOffsetY = 0;
+                 
+                 ctx.fillStyle = `rgba(0, 191, 255, ${layer.alpha})`;
+                 ctx.beginPath();
+                 ctx.arc(circleX, circleY, layer.radius, 0, Math.PI * 2);
+                 ctx.fill();
+             });
+             
+             // Xoá shadow cho vòng tròn chính
+             ctx.shadowColor = 'transparent';
+             ctx.shadowBlur = 0;
+             
+             // Vẽ viền sáng chính với độ dày vừa phải
+             ctx.strokeStyle = '#00BFFF';
+             ctx.lineWidth = 3;
+             ctx.beginPath();
+             ctx.arc(circleX, circleY, circleRadius, 0, Math.PI * 2);
+             ctx.stroke();
+             
+             // Thêm viền sáng bên trong để tăng độ sâu
+             ctx.strokeStyle = 'rgba(0, 191, 255, 0.7)';
+             ctx.lineWidth = 1.5;
+             ctx.beginPath();
+             ctx.arc(circleX, circleY, circleRadius - 1, 0, Math.PI * 2);
+             ctx.stroke();
             
             ctx.restore();
             
@@ -753,7 +766,7 @@ class InvitationGenerator {
         const circleX = rect.x + this.anchor.avatar.x * rect.width;
         const paddingBelowRespect = 54 * (rect.height / 650);
         let nameX = circleX;
-        let nameY = rect.y + this.anchor.inviteRespectBottomY * rect.height + paddingBelowRespect;
+        let nameY = rect.y + this.anchor.inviteRespectBottomY * rect.height + paddingBelowRespect +17;
 
         // Đảm bảo tên nằm trên tiêu đề sự kiện ít nhất 6px
         const nameMaxY = rect.y + this.anchor.eventHeaderTopY * rect.height - 6;
@@ -782,74 +795,49 @@ class InvitationGenerator {
 
 		// Thông số tỷ lệ theo base 650
 		const scale = rect.width / 650;
-		const gap = Math.round(2 * scale); // khoảng cách nhỏ với avatar
 		const fontSize = Math.max(12, Math.round(16 * scale));
 		ctx.font = `bold ${fontSize}px Arial`;
 		const text = ticketType.toUpperCase();
 		const textWidth = Math.ceil(ctx.measureText(text).width);
 		
-		// Kích thước badge nhỏ gọn hơn
-		const badgeSize = Math.max(20, Math.round(28 * scale));
-		const padding = Math.round(6 * scale);
-		const totalWidth = badgeSize + padding * 2 + textWidth + padding;
-		const totalHeight = Math.max(badgeSize, fontSize + padding * 2);
+		// Đặt text ngay dưới avatar
+		const textX = circleX;
+		const textY = circleY + circleRadius + Math.round(15 * scale); // Khoảng cách 15px dưới avatar
 		
-		// Đặt badge dính sát cạnh phải avatar
-		let left = Math.round(circleX + circleRadius + gap);
-		let top = Math.round(circleY - totalHeight / 2);
-		const right = left + totalWidth;
-		const bottom = top + totalHeight;
-		const centerY = Math.round((top + bottom) / 2);
-
-		// Giữ trong biên canvas
-		const maxRight = this.displayWidth - Math.round(10 * scale);
-		if (right > maxRight) {
-			const delta = right - maxRight;
-			left -= delta;
-		}
-
-		// Vẽ icon badge tròn bên trái
-		const iconX = left + padding;
-		const iconY = centerY;
-		const iconRadius = badgeSize / 2;
-		
-		// Gradient cho icon theo màu hạng vé
-		const baseColor = this.ticketColors[ticketType] || '#ff3b8a';
-		const iconGrad = ctx.createRadialGradient(iconX, iconY, 0, iconX, iconY, iconRadius);
-		iconGrad.addColorStop(0, this.lightenColor(baseColor, 0.4));
-		iconGrad.addColorStop(0.7, baseColor);
-		iconGrad.addColorStop(1, this.darkenColor(baseColor, 0.3));
-		
+		// Vẽ text với hiệu ứng gradient và glow
 		ctx.save();
-		ctx.fillStyle = iconGrad;
-		ctx.beginPath();
-		ctx.arc(iconX, iconY, iconRadius, 0, 2 * Math.PI);
-		ctx.fill();
 		
-		// Viền neon cho icon
+		// Tạo gradient cho text theo màu hạng vé
+		const baseColor = this.ticketColors[ticketType] || '#ff3b8a';
+		const textGrad = ctx.createLinearGradient(textX - textWidth/2, textY - fontSize/2, textX + textWidth/2, textY + fontSize/2);
+		textGrad.addColorStop(0, this.lightenColor(baseColor, 0.6));
+		textGrad.addColorStop(0.3, this.lightenColor(baseColor, 0.3));
+		textGrad.addColorStop(0.7, baseColor);
+		textGrad.addColorStop(1, this.darkenColor(baseColor, 0.4));
+		
+		// Viền neon cyan xung quanh text
 		ctx.shadowColor = 'rgba(64, 224, 255, 0.8)';
 		ctx.shadowBlur = 6 * scale;
-		ctx.strokeStyle = '#41e6ff';
-		ctx.lineWidth = Math.max(1, Math.round(1.2 * scale));
-		ctx.stroke();
+		ctx.shadowOffsetX = 0;
+		ctx.shadowOffsetY = 0;
 		
-		// Hiệu ứng gloss cho icon
-		const glossGrad = ctx.createRadialGradient(iconX - iconRadius/3, iconY - iconRadius/3, 0, iconX, iconY, iconRadius);
-		glossGrad.addColorStop(0, 'rgba(255,255,255,0.4)');
-		glossGrad.addColorStop(0.6, 'rgba(255,255,255,0.1)');
-		glossGrad.addColorStop(1, 'rgba(255,255,255,0)');
-		ctx.fillStyle = glossGrad;
-		ctx.fill();
-		ctx.restore();
-
-		// Vẽ text bên phải icon
-		const textX = iconX + iconRadius + padding;
-		ctx.save();
-		ctx.fillStyle = '#FFFFFF';
-		ctx.textAlign = 'left';
+		// Vẽ text với gradient
+		ctx.fillStyle = textGrad;
+		ctx.textAlign = 'center';
 		ctx.textBaseline = 'middle';
 		ctx.font = `bold ${fontSize}px Arial`;
-		ctx.fillText(text, textX, centerY);
+		ctx.fillText(text, textX, textY);
+		
+		// Thêm hiệu ứng gloss trên text
+		const glossGrad = ctx.createLinearGradient(textX - textWidth/2, textY - fontSize/2, textX + textWidth/2, textY + fontSize/2);
+		glossGrad.addColorStop(0, 'rgba(255,255,255,0.6)');
+		glossGrad.addColorStop(0.3, 'rgba(255,255,255,0.3)');
+		glossGrad.addColorStop(0.7, 'rgba(255,255,255,0.1)');
+		glossGrad.addColorStop(1, 'rgba(255,255,255,0)');
+		
+		ctx.fillStyle = glossGrad;
+		ctx.fillText(text, textX, textY);
+		
 		ctx.restore();
 	 }
     
@@ -959,14 +947,18 @@ class InvitationGenerator {
             (B > 255 ? 255 : B < 0 ? 0 : B)).toString(16).slice(1);
     }
     
-    showNotification(message) {
+    showNotification(message, type = 'success') {
         const notification = document.createElement('div');
         notification.textContent = message;
+        
+        const bgColor = type === 'error' ? '#f44336' : '#4CAF50';
+        const icon = type === 'error' ? '❌' : '✅';
+        
         notification.style.cssText = `
             position: fixed;
             top: 20px;
             right: 20px;
-            background: #4CAF50;
+            background: ${bgColor};
             color: white;
             padding: 15px 25px;
             border-radius: 10px;
@@ -975,7 +967,12 @@ class InvitationGenerator {
             font-family: Roboto, sans-serif;
             font-weight: 500;
             animation: slideInRight 0.3s ease-out;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         `;
+        
+        notification.innerHTML = `${icon} ${message}`;
         
         if (!document.querySelector('#notification-styles')) {
             const style = document.createElement('style');
