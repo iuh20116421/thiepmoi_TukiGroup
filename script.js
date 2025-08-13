@@ -10,7 +10,7 @@ class InvitationGenerator {
         this.downloadBtn = document.getElementById('downloadInvitation');
         this.showInstructionsBtn = document.getElementById('showInstructions');
         
-        // Photo modal elements
+        // Phần tử trong modal ảnh
         this.photoModal = document.getElementById('photoModal');
         this.uploadPhotoBtn = document.getElementById('uploadPhotoBtn');
         this.cropCanvas = document.getElementById('cropCanvas');
@@ -20,21 +20,33 @@ class InvitationGenerator {
         this.resetCrop = document.getElementById('resetCrop');
         this.scaleSlider = document.getElementById('scaleSlider');
         
-        // Photo controls
-        this.photoControls = document.getElementById('photoControls');
-        this.editPhotoBtn = document.getElementById('editPhotoBtn');
+        // Điều khiển ảnh (đã bỏ phần inline)
+        this.photoControls = null;
+        this.editPhotoBtn = null;
         
-        // Photo data
+        // Dữ liệu ảnh người dùng
         this.userPhoto = null;
         this.photoImage = null;
         this.photoScale = 1;
         this.photoPositionX = 0;
         this.photoPositionY = 0;
         
-        // Background image
+        // Neo vị trí (theo tỉ lệ trên khung 650x650) để các lớp vẽ bám theo ảnh khi letterbox
+        this.anchor = {
+            avatar: { x: 480 / 650, y: 150 / 650, r: 78 / 650 },
+            inviteRespectBottomY: 254 / 650,
+            eventHeaderTopY: 351 / 650
+        };
+        // Hình chữ nhật vùng ảnh nền được vẽ bên trong canvas vuông
+        this.designRect = { x: 0, y: 0, width: 650, height: 650 };
+        
+        // Ảnh nền khung thiệp
         this.backgroundImage = null;
         
-        // Ticket colors with enhanced metallic effects
+        // Trạng thái nội bộ
+        this.isFileDialogOpen = false;
+        
+        // Màu theo hạng vé
         this.ticketColors = {
             'Silver': '#C0C0C0',
             'Gold': '#FFD700',
@@ -48,27 +60,34 @@ class InvitationGenerator {
     }
     
     initializeCanvas() {
-        // Set high DPI canvas for crisp image quality
-        const dpr = window.devicePixelRatio || 1;
-        
-        // Set display size (what user sees)
-        this.canvas.style.width = '800px';
-        this.canvas.style.height = '600px';
-        
-        // Set actual canvas size (internal resolution)
-        this.canvas.width = 800 * dpr;
-        this.canvas.height = 600 * dpr;
-        
-        // Scale the drawing context to match the display size
-        this.ctx.scale(dpr, dpr);
-        
-        // Store the display dimensions for calculations
-        this.displayWidth = 800;
-        this.displayHeight = 600;
+        // Thiết lập High-DPI để ảnh vẽ sắc nét
+        const devicePixelRatioValue = window.devicePixelRatio || 1;
+
+        // Kích thước vẽ logic cố định 650x650
+        this.canvas.width = 650 * devicePixelRatioValue;
+        this.canvas.height = 650 * devicePixelRatioValue;
+
+        // Xoá kích thước CSS inline để không phá vỡ responsive
+        this.canvas.style.width = '';
+        this.canvas.style.height = '';
+
+        // Scale ngữ cảnh vẽ về đơn vị điểm ảnh CSS
+        this.ctx.setTransform(devicePixelRatioValue, 0, 0, devicePixelRatioValue, 0, 0);
+
+        // Kích thước vẽ logic
+        this.displayWidth = 650;
+        this.displayHeight = 650;
+
+        // Có thể cập nhật lại neo avatar/badge nếu cần khi responsive
+        this.updateAvatarPosition();
+    }
+
+    updateAvatarPosition() {
+        // Dùng neo theo tỉ lệ; hiện không cần tính lại
     }
     
     setupEventListeners() {
-        // Form events
+        // Sự kiện của biểu mẫu
         this.generateBtn.addEventListener('click', () => {
             this.openPhotoModal();
         });
@@ -81,13 +100,21 @@ class InvitationGenerator {
             document.getElementById('welcomeModal').style.display = 'block';
         });
         
-        // Photo modal events
+        // Sự kiện trong modal ảnh
         this.uploadPhotoBtn.addEventListener('click', () => {
+            // Ngăn nhấn ngoài đóng modal khi hộp thoại chọn file của hệ điều hành trả về
+            this.isFileDialogOpen = true;
             this.photoInput.click();
         });
         
         this.photoInput.addEventListener('change', (e) => {
             this.handlePhotoUpload(e);
+        });
+        // Một số trình duyệt trả focus về window dễ kích hoạt đóng modal.
+        // Chặn nổi bọt trên các phần tử chính trong modal để tránh đóng ngoài ý muốn.
+        [this.photoModal, this.photoPreview, this.cropCanvas].forEach(el => {
+            if (!el) return;
+            el.addEventListener('click', (evt) => evt.stopPropagation());
         });
         
         this.cancelCrop.addEventListener('click', () => {
@@ -102,7 +129,7 @@ class InvitationGenerator {
             this.resetPhotoPosition();
         });
         
-        // Scale slider in modal
+        // Thanh trượt phóng to/thu nhỏ trong modal
         if (this.scaleSlider) {
             this.scaleSlider.addEventListener('input', (e) => {
                 this.photoScale = parseFloat(e.target.value);
@@ -110,15 +137,12 @@ class InvitationGenerator {
             });
         }
         
-        // Crop canvas drag events
+        // Sự kiện kéo ảnh trong vùng cắt
         this.setupCropCanvasEvents();
         
-        // Photo controls
-        this.editPhotoBtn.addEventListener('click', () => {
-            this.openPhotoModal();
-        });
+        // Đã bỏ nút chỉnh sửa inline; chỉ mở modal bằng nút chính
         
-        // Auto-generate when input changes
+        // Tự vẽ lại khi thay đổi thông tin đầu vào
         this.guestNameInput.addEventListener('input', () => {
             this.generateInvitation();
         });
@@ -130,11 +154,76 @@ class InvitationGenerator {
         this.ticketTypeSelect.addEventListener('change', () => {
             this.generateInvitation();
         });
+
+        // Đồng bộ dropdown tuỳ chỉnh với select ẩn
+        const hiddenSelect = document.getElementById('ticketType');
+        const dropdown = document.getElementById('ticketDropdown');
+        const toggle = dropdown ? dropdown.querySelector('.dropdown-toggle') : null;
+        const labelEl = dropdown ? dropdown.querySelector('.dropdown-label') : null;
+        const options = dropdown ? dropdown.querySelectorAll('.dropdown-option') : [];
+
+        if (dropdown && toggle && labelEl && options.length) {
+            // Mở/đóng menu
+            toggle.addEventListener('click', (e) => {
+                e.preventDefault();
+                const expanded = dropdown.getAttribute('aria-expanded') === 'true';
+                dropdown.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+            });
+
+            // Chọn một tuỳ chọn
+            const updateLabelForViewport = (optEl) => {
+                const longText = optEl.getAttribute('data-long') || optEl.textContent;
+                const shortText = optEl.getAttribute('data-short') || longText;
+                const isMobile = window.matchMedia('(max-width: 768px)').matches;
+                const text = isMobile ? shortText : longText;
+                labelEl.textContent = text;
+                toggle.title = longText;
+            };
+
+            options.forEach((opt) => {
+                opt.addEventListener('click', () => {
+                    options.forEach(o => o.removeAttribute('aria-selected'));
+                    opt.setAttribute('aria-selected', 'true');
+                    const value = opt.getAttribute('data-value');
+                    updateLabelForViewport(opt);
+                    hiddenSelect.value = value;
+                    dropdown.setAttribute('aria-expanded', 'false');
+                    this.generateInvitation();
+                });
+            });
+
+            // Khởi tạo nhãn khi tải trang và khi đổi kích thước
+            const selected = dropdown.querySelector('.dropdown-option[aria-selected="true"]') || options[0];
+            if (selected) updateLabelForViewport(selected);
+            window.addEventListener('resize', () => {
+                const current = dropdown.querySelector('.dropdown-option[aria-selected="true"]') || options[0];
+                if (current) updateLabelForViewport(current);
+            });
+
+            // Đóng khi click ra ngoài
+            window.addEventListener('click', (e) => {
+                if (dropdown.getAttribute('aria-expanded') === 'true' && !dropdown.contains(e.target)) {
+                    dropdown.setAttribute('aria-expanded', 'false');
+                }
+            });
+
+            // Hỗ trợ bàn phím: Enter/Space mở, mũi tên điều hướng, Enter để chọn
+            toggle.addEventListener('keydown', (e) => {
+                const key = e.key;
+                if (key === 'Enter' || key === ' ') {
+                    e.preventDefault();
+                    toggle.click();
+                }
+                if ((key === 'ArrowDown' || key === 'ArrowUp') && dropdown.getAttribute('aria-expanded') !== 'true') {
+                    dropdown.setAttribute('aria-expanded', 'true');
+                }
+            });
+        }
         
-        // Modal events
+        // Sự kiện chung của các modal
         this.setupModalEvents();
         
-        // Direct close button event for welcome modal
+        // Sự kiện nút đóng trực tiếp cho modal chào mừng
         const closeWelcomeBtn = document.getElementById('closeWelcomeModal');
         if (closeWelcomeBtn) {
             closeWelcomeBtn.onclick = (e) => {
@@ -144,12 +233,12 @@ class InvitationGenerator {
             };
         }
         
-        // Show welcome modal once
+        // Hiển thị modal chào mừng khi vào trang
         this.showWelcomeModalOnce();
     }
     
     setupModalEvents() {
-        // Close modals when clicking X
+        // Đóng modal khi bấm nút X
         document.querySelectorAll('.close').forEach(closeBtn => {
             closeBtn.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -163,9 +252,13 @@ class InvitationGenerator {
             });
         });
         
-        // Close modals when clicking outside
+        // Đóng modal khi click ra ngoài
         window.addEventListener('click', (e) => {
-            if (e.target.classList.contains('modal')) {
+            if (this.isFileDialogOpen) return; // bỏ qua click giả/sau khi chọn file
+            if (!e.target) return;
+            const targetHasModalClass = e.target.classList && e.target.classList.contains('modal');
+            const clickedInsidePhoto = this.photoModal && this.photoModal.contains(e.target);
+            if (targetHasModalClass && !clickedInsidePhoto) {
                 e.target.style.display = 'none';
                 if (e.target.id === 'photoModal') {
                     this.closePhotoModal();
@@ -173,7 +266,7 @@ class InvitationGenerator {
             }
         });
         
-        // Welcome modal specific events
+        // Sự kiện riêng cho modal chào mừng
         const closeWelcomeModal = document.getElementById('closeWelcomeModal');
         const welcomeModal = document.getElementById('welcomeModal');
         
@@ -205,16 +298,19 @@ class InvitationGenerator {
             console.warn('frameEvents.jpg not found, using fallback design');
             this.generateInvitation();
         };
-        this.backgroundImage.src = 'image/framEvents.jpg';
+        this.backgroundImage.src = 'image/ThiepMoi.png';
     }
     
     openPhotoModal() {
         this.photoModal.style.display = 'block';
+        // Đảm bảo canvas preview khớp kích thước CSS để nét
+        setTimeout(() => this.updateCropPreview(), 0);
     }
     
     closePhotoModal() {
-        this.photoModal.style.display = 'none';
-        this.photoPreview.style.display = 'none';
+        if (this.photoModal) this.photoModal.style.display = 'none';
+        if (this.photoPreview) this.photoPreview.style.display = 'none';
+        this.isFileDialogOpen = false;
     }
     
     handlePhotoUpload(event) {
@@ -228,10 +324,16 @@ class InvitationGenerator {
                     this.resetPhotoPosition();
                     this.photoPreview.style.display = 'block';
                     this.updateCropPreview();
+                    // Ensure modal stays open after selecting a file
+                    if (this.photoModal) this.photoModal.style.display = 'block';
+                    this.isFileDialogOpen = false;
                 };
                 this.photoImage.src = e.target.result;
             };
             reader.readAsDataURL(file);
+        } else {
+            // Khi hộp thoại bị huỷ, cho phép click ngoài để đóng lại
+            this.isFileDialogOpen = false;
         }
     }
     
@@ -239,59 +341,103 @@ class InvitationGenerator {
         if (!this.photoImage) return;
         
         const cropCtx = this.cropCanvas.getContext('2d');
+        // Chỉnh kích thước canvas preview theo kích thước hiển thị thực tế
+        const rect = this.cropCanvas.getBoundingClientRect();
+        let size = Math.min(rect.width || 0, (rect.height || rect.width || 0));
+        // Kích thước dự phòng nếu layout chưa sẵn sàng
+        if (!size || size < 50) size = this.cropCanvas.width || 300;
+        if (this.cropCanvas.width !== size || this.cropCanvas.height !== size) {
+            this.cropCanvas.width = size;
+            this.cropCanvas.height = size;
+        }
         cropCtx.clearRect(0, 0, this.cropCanvas.width, this.cropCanvas.height);
         
-        // Draw white circle background first
-        cropCtx.fillStyle = 'rgba(255, 255, 255, 0.95)';
-        cropCtx.beginPath();
-        cropCtx.arc(this.cropCanvas.width/2, this.cropCanvas.height/2, this.cropCanvas.width/2 - 10, 0, Math.PI * 2);
-        cropCtx.fill();
+        const centerX = this.cropCanvas.width/2;
+        const centerY = this.cropCanvas.height/2;
+        const radius = this.cropCanvas.width/2 - 10;
         
-        // Create circular clipping path
+        // Vẽ viền phát sáng xanh ở preview
+        cropCtx.save();
+        
+        // Các lớp phát sáng bên ngoài (nhiều lớp để chân thực)
+        const glowLayers = [
+            { radius: radius + 15, alpha: 0.1, color: '#00BFFF' },
+            { radius: radius + 10, alpha: 0.2, color: '#00BFFF' },
+            { radius: radius + 5, alpha: 0.3, color: '#00BFFF' },
+            { radius: radius + 2, alpha: 0.5, color: '#00BFFF' }
+        ];
+        
+        // Vẽ các lớp sáng từ ngoài vào trong
+        glowLayers.forEach(layer => {
+            cropCtx.shadowColor = layer.color;
+            cropCtx.shadowBlur = 20;
+            cropCtx.shadowOffsetX = 0;
+            cropCtx.shadowOffsetY = 0;
+            
+            cropCtx.fillStyle = `rgba(0, 191, 255, ${layer.alpha})`;
+            cropCtx.beginPath();
+            cropCtx.arc(centerX, centerY, layer.radius, 0, Math.PI * 2);
+            cropCtx.fill();
+        });
+        
+        // Xoá bóng cho vòng tròn chính
+        cropCtx.shadowColor = 'transparent';
+        cropCtx.shadowBlur = 0;
+        
+        // Vẽ viền phát sáng chính
+        cropCtx.strokeStyle = '#00BFFF';
+        cropCtx.lineWidth = 4;
+        cropCtx.beginPath();
+        cropCtx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+        cropCtx.stroke();
+        
+        // Thêm hiệu ứng sáng bên trong
+        cropCtx.strokeStyle = 'rgba(0, 191, 255, 0.6)';
+        cropCtx.lineWidth = 2;
+        cropCtx.beginPath();
+        cropCtx.arc(centerX, centerY, radius - 2, 0, Math.PI * 2);
+        cropCtx.stroke();
+        
+        cropCtx.restore();
+        
+        // Tạo vùng cắt tròn
         cropCtx.save();
         cropCtx.beginPath();
-        cropCtx.arc(this.cropCanvas.width/2, this.cropCanvas.height/2, this.cropCanvas.width/2 - 10, 0, Math.PI * 2);
+        cropCtx.arc(centerX, centerY, radius, 0, Math.PI * 2);
         cropCtx.clip();
         
-        // Calculate image scaling and positioning
+        // Tính toán tỉ lệ và vị trí ảnh
         const imgAspect = this.photoImage.width / this.photoImage.height;
         let drawWidth, drawHeight;
         
-        // Calculate base size to fit the circle
+        // Kích thước cơ sở vừa khít hình tròn
         const baseSize = this.cropCanvas.width - 20;
         
         if (imgAspect > 1) {
-            // Landscape image - fit by height
+            // Ảnh ngang: khớp theo chiều cao
             drawHeight = baseSize * this.photoScale;
             drawWidth = drawHeight * imgAspect;
         } else {
-            // Portrait image - fit by width
+            // Ảnh dọc: khớp theo chiều rộng
             drawWidth = baseSize * this.photoScale;
             drawHeight = drawWidth / imgAspect;
         }
         
-        // Calculate maximum allowed offset to keep image within circle
+        // Độ lệch tối đa để ảnh không vượt khỏi hình tròn
         const maxOffsetX = Math.max(0, (drawWidth - baseSize) / 2);
         const maxOffsetY = Math.max(0, (drawHeight - baseSize) / 2);
         
-        // Clamp position to keep image within circle bounds
+        // Khoá vị trí để ảnh luôn trong hình tròn
         const clampedPositionX = Math.max(-maxOffsetX, Math.min(maxOffsetX, this.photoPositionX));
         const clampedPositionY = Math.max(-maxOffsetY, Math.min(maxOffsetY, this.photoPositionY));
         
-        // Center the image and apply position offsets
-        const drawX = (this.cropCanvas.width - drawWidth) / 2 + clampedPositionX;
-        const drawY = (this.cropCanvas.height - drawHeight) / 2 + clampedPositionY;
+        // Căn giữa ảnh và áp dụng độ lệch
+        const drawX = Math.round((this.cropCanvas.width - drawWidth) / 2 + clampedPositionX);
+        const drawY = Math.round((this.cropCanvas.height - drawHeight) / 2 + clampedPositionY);
         
-        // Draw the image
+        // Vẽ ảnh
         cropCtx.drawImage(this.photoImage, drawX, drawY, drawWidth, drawHeight);
         cropCtx.restore();
-        
-        // Add white border
-        cropCtx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
-        cropCtx.lineWidth = 3;
-        cropCtx.beginPath();
-        cropCtx.arc(this.cropCanvas.width/2, this.cropCanvas.height/2, this.cropCanvas.width/2 - 10, 0, Math.PI * 2);
-        cropCtx.stroke();
     }
     
     saveCroppedPhoto() {
@@ -303,16 +449,58 @@ class InvitationGenerator {
         finalCanvas.width = 150;
         finalCanvas.height = 150;
         
-        // Draw white circle background first
-        finalCtx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+        const centerX = 75;
+        const centerY = 75;
+        const radius = 75;
+        
+        // Draw glowing blue border effect for saved photo
+        finalCtx.save();
+        
+        // Create outer glow effect (multiple layers for realistic glow)
+        const glowLayers = [
+            { radius: radius + 15, alpha: 0.1, color: '#00BFFF' },
+            { radius: radius + 10, alpha: 0.2, color: '#00BFFF' },
+            { radius: radius + 5, alpha: 0.3, color: '#00BFFF' },
+            { radius: radius + 2, alpha: 0.5, color: '#00BFFF' }
+        ];
+        
+        // Draw glow layers from outer to inner
+        glowLayers.forEach(layer => {
+            finalCtx.shadowColor = layer.color;
+            finalCtx.shadowBlur = 20;
+            finalCtx.shadowOffsetX = 0;
+            finalCtx.shadowOffsetY = 0;
+            
+            finalCtx.fillStyle = `rgba(0, 191, 255, ${layer.alpha})`;
+            finalCtx.beginPath();
+            finalCtx.arc(centerX, centerY, layer.radius, 0, Math.PI * 2);
+            finalCtx.fill();
+        });
+        
+        // Reset shadow for the main circle
+        finalCtx.shadowColor = 'transparent';
+        finalCtx.shadowBlur = 0;
+        
+        // Draw the main glowing border
+        finalCtx.strokeStyle = '#00BFFF';
+        finalCtx.lineWidth = 4;
         finalCtx.beginPath();
-        finalCtx.arc(75, 75, 75, 0, Math.PI * 2);
-        finalCtx.fill();
+        finalCtx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+        finalCtx.stroke();
+        
+        // Add inner glow effect
+        finalCtx.strokeStyle = 'rgba(0, 191, 255, 0.6)';
+        finalCtx.lineWidth = 2;
+        finalCtx.beginPath();
+        finalCtx.arc(centerX, centerY, radius - 2, 0, Math.PI * 2);
+        finalCtx.stroke();
+        
+        finalCtx.restore();
         
         // Create circular clipping path
         finalCtx.save();
         finalCtx.beginPath();
-        finalCtx.arc(75, 75, 75, 0, Math.PI * 2);
+        finalCtx.arc(centerX, centerY, radius, 0, Math.PI * 2);
         finalCtx.clip();
         
         // Calculate image scaling and positioning
@@ -352,7 +540,6 @@ class InvitationGenerator {
         this.userPhoto = finalCanvas.toDataURL();
         
         this.closePhotoModal();
-        this.photoControls.style.display = 'block';
         this.generateInvitation();
     }
     
@@ -405,6 +592,9 @@ class InvitationGenerator {
         this.cropCanvas.addEventListener('mouseleave', () => {
             isDragging = false;
         });
+
+        // Recompute preview center on resize to keep avatar centered
+        window.addEventListener('resize', () => this.updateCropPreview());
     }
     
     generateInvitation() {
@@ -415,34 +605,92 @@ class InvitationGenerator {
             // Draw background image with high quality scaling
             this.ctx.imageSmoothingEnabled = true;
             this.ctx.imageSmoothingQuality = 'high';
-            
-            // Draw background image to fit exactly 800x600 display size
-            this.ctx.drawImage(this.backgroundImage, 0, 0, this.displayWidth, this.displayHeight);
-            
-            // Draw user photo in the white circle area
-            this.drawUserPhotoOnFrame();
-            
-            // Draw guest name and title
-            this.drawGuestNameOnFrame();
-            
-                         // Draw ticket type badge
-             this.drawTicketTypeBadgeOnFrame();
+
+            // Letterbox-fit the background into the square canvas (object-fit: contain)
+            const imgW = this.backgroundImage.width;
+            const imgH = this.backgroundImage.height;
+            const scale = Math.min(this.displayWidth / imgW, this.displayHeight / imgH);
+            const drawW = Math.round(imgW * scale);
+            const drawH = Math.round(imgH * scale);
+            const dx = Math.round((this.displayWidth - drawW) / 2);
+            const dy = Math.round((this.displayHeight - drawH) / 2);
+
+            // Paint backdrop so letterboxing feels intentional
+            const bgGrad = this.ctx.createLinearGradient(0, 0, this.displayWidth, this.displayHeight);
+            bgGrad.addColorStop(0, '#0f2b4c');
+            bgGrad.addColorStop(1, '#0a1a30');
+            this.ctx.fillStyle = bgGrad;
+            this.ctx.fillRect(0, 0, this.displayWidth, this.displayHeight);
+
+            // Draw the centered background image
+            this.ctx.drawImage(this.backgroundImage, dx, dy, drawW, drawH);
+
+            // Store rect for overlays
+            this.designRect = { x: dx, y: dy, width: drawW, height: drawH };
+
+            // Draw overlays relative to image rect
+            this.drawUserPhotoOnFrame(this.ctx, this.designRect);
+            this.drawGuestNameOnFrame(this.ctx, this.designRect);
+            this.drawTicketTypeBadgeOnFrame(this.ctx, this.designRect);
         } else {
             // Fallback design if background image not loaded
             this.drawFallbackDesign();
         }
     }
     
-    drawUserPhotoOnFrame(ctx = this.ctx) {
-        // Position of the white circle in the frame (adjust these coordinates to match the existing white circle in frameEvents.jpg)
-        const circleX = 590; // X position of circle center - adjusted to match existing white circle
-        const circleY = 160; // Y position of circle center - adjusted to match existing white circle
-        const circleRadius = 77; // Radius of the white circle - adjusted to match existing white circle
-        
-        // Don't draw white circle background since it already exists in the frameEvents.jpg
-        // Just use the existing white circle in the background image
+    drawUserPhotoOnFrame(ctx = this.ctx, rect = this.designRect) {
+        // Compute circle position from normalized anchors against the image rect
+        const circleX = rect.x + this.anchor.avatar.x * rect.width;
+        const circleY = rect.y + this.anchor.avatar.y * rect.height;
+        const baseScale = rect.width / 650;
+        const circleRadius = Math.max(10, Math.round(this.anchor.avatar.r * 650 * baseScale));
         
         if (this.userPhoto && this.photoImage) {
+            // Draw glowing blue border effect for uploaded avatar
+            ctx.save();
+            
+            // Create outer glow effect (multiple layers for realistic glow)
+            const glowLayers = [
+                { radius: circleRadius + 15, alpha: 0.1, color: '#00BFFF' },
+                { radius: circleRadius + 10, alpha: 0.2, color: '#00BFFF' },
+                { radius: circleRadius + 5, alpha: 0.3, color: '#00BFFF' },
+                { radius: circleRadius + 2, alpha: 0.5, color: '#00BFFF' }
+            ];
+            
+            // Draw glow layers from outer to inner
+            glowLayers.forEach(layer => {
+                ctx.shadowColor = layer.color;
+                ctx.shadowBlur = 20;
+                ctx.shadowOffsetX = 0;
+                ctx.shadowOffsetY = 0;
+                
+                ctx.fillStyle = `rgba(0, 191, 255, ${layer.alpha})`;
+                ctx.beginPath();
+                ctx.arc(circleX, circleY, layer.radius, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            
+            // Reset shadow for the main circle
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+            
+            // Draw the main glowing border
+            ctx.strokeStyle = '#00BFFF';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.arc(circleX, circleY, circleRadius, 0, Math.PI * 2);
+            ctx.stroke();
+            
+            // Add inner glow effect
+            ctx.strokeStyle = 'rgba(0, 191, 255, 0.6)';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(circleX, circleY, circleRadius - 2, 0, Math.PI * 2);
+            ctx.stroke();
+            
+            ctx.restore();
+            
+            // Draw the avatar image
             ctx.save();
             
             // Create circular clipping path
@@ -484,107 +732,131 @@ class InvitationGenerator {
             
             ctx.restore();
         } else {
-            // Show placeholder in the white circle if no photo uploaded
+            // Hiển thị placeholder nếu chưa có ảnh
             ctx.fillStyle = 'rgba(200, 200, 200, 0.8)';
             ctx.beginPath();
             ctx.arc(circleX, circleY, circleRadius, 0, Math.PI * 2);
             ctx.fill();
             
-            // Add upload instruction icon
+            // Biểu tượng gợi ý tải ảnh
             ctx.fillStyle = '#666666';
             ctx.font = '28px Arial';
             ctx.textAlign = 'center';
             ctx.fillText('👤', circleX, circleY + 8);
         }
-        
-        // Add a subtle white border around the photo circle (optional, since white circle already exists in background)
-        // ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
-        // ctx.lineWidth = 3;
-        // ctx.beginPath();
-        // ctx.arc(circleX, circleY, circleRadius, 0, Math.PI * 2);
-        // ctx.stroke();
     }
     
-    drawGuestNameOnFrame(ctx = this.ctx) {
+    drawGuestNameOnFrame(ctx = this.ctx, rect = this.designRect) {
         const guestName = this.guestNameInput.value || 'TÊN KHÁCH MỜI';
-        const guestTitle = this.guestTitleInput.value || 'Chức danh';
         
-        // Position name and title below the white circle (adjusted to match new circle position)
-        const circleX = 580;
-        const circleY = 210;
-        const circleRadius = 60;
+        // Cùng trục X với avatar; đặt chữ giữa hai mốc neo
+        const circleX = rect.x + this.anchor.avatar.x * rect.width;
+        const paddingBelowRespect = 54 * (rect.height / 650);
+        let nameX = circleX;
+        let nameY = rect.y + this.anchor.inviteRespectBottomY * rect.height + paddingBelowRespect;
+
+        // Đảm bảo tên nằm trên tiêu đề sự kiện ít nhất 6px
+        const nameMaxY = rect.y + this.anchor.eventHeaderTopY * rect.height - 6;
+        if (nameY > nameMaxY) {
+            nameY = nameMaxY;
+        }
         
-        const nameX = circleX;
-        const nameY = circleY + circleRadius + 30;
-        const titleX = circleX;
-        const titleY = nameY + 25;
-        
-        // Guest name
+        // Vẽ tên khách mời
+        const scale = rect.width / 650;
+        const fontSize = Math.max(14, Math.round(18 * scale));
         ctx.fillStyle = '#FFFFFF';
-        ctx.font = 'bold 18px Arial';
+        ctx.font = `bold ${fontSize}px Arial`;
         ctx.textAlign = 'center';
         ctx.fillText(guestName, nameX, nameY);
         
-        // Guest title
-        ctx.fillStyle = '#E0E0E0';
-        ctx.font = '14px Arial';
-        ctx.fillText(guestTitle, titleX, titleY);
+        // No title text drawn
     }
     
-    drawTicketTypeBadgeOnFrame(ctx = this.ctx) {
-        const ticketType = this.ticketTypeSelect.value;
-        const ticketColor = this.ticketColors[ticketType];
-        
-        // Position of the avatar circle (same as in drawUserPhotoOnFrame)
-        const circleX = 580;
-        const circleY = 200;
-        const circleRadius = 60;
-        
-        // Position circular badge at top-right corner of avatar circle
-        const badgeRadius = 16; // Small circular badge (slightly smaller to fit better)
-        const badgeX = circleX + circleRadius - badgeRadius + 3; // Slightly overlapping
-        const badgeY = circleY - circleRadius + badgeRadius - 3; // Top-right corner
-        
-        // Draw circular badge background with gradient for metallic effect
-        const gradient = ctx.createRadialGradient(badgeX, badgeY, 0, badgeX, badgeY, badgeRadius);
-        gradient.addColorStop(0, ticketColor);
-        gradient.addColorStop(0.7, ticketColor);
-        gradient.addColorStop(1, this.darkenColor(ticketColor, 0.3));
-        
-        ctx.fillStyle = gradient;
-        ctx.beginPath();
-        ctx.arc(badgeX, badgeY, badgeRadius, 0, Math.PI * 2);
-        ctx.fill();
-        
-        // Add metallic border
-        ctx.strokeStyle = this.lightenColor(ticketColor, 0.4);
-        ctx.lineWidth = 2;
-        ctx.stroke();
-        
-        // Draw badge text
-        ctx.fillStyle = '#FFFFFF';
-        ctx.font = 'bold 12px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText(ticketType, badgeX, badgeY + 4);
-        
-        // Add subtle shadow
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
-        ctx.shadowBlur = 3;
-        ctx.shadowOffsetX = 1;
-        ctx.shadowOffsetY = 1;
-        ctx.beginPath();
-        ctx.arc(badgeX, badgeY, badgeRadius, 0, Math.PI * 2);
-        ctx.stroke();
-        ctx.shadowColor = 'transparent';
-        ctx.shadowBlur = 0;
-        ctx.shadowOffsetX = 0;
-        ctx.shadowOffsetY = 0;
-    }
+	 drawTicketTypeBadgeOnFrame(ctx = this.ctx, rect = this.designRect) {
+		const ticketType = this.ticketTypeSelect.value;
+
+		// Tính vị trí vòng tròn avatar từ các neo
+		const circleX = rect.x + this.anchor.avatar.x * rect.width;
+		const circleY = rect.y + this.anchor.avatar.y * rect.height;
+		const circleRadius = Math.max(10, Math.round(this.anchor.avatar.r * 650 * (rect.width / 650)));
+
+		// Thông số tỷ lệ theo base 650
+		const scale = rect.width / 650;
+		const gap = Math.round(2 * scale); // khoảng cách nhỏ với avatar
+		const fontSize = Math.max(12, Math.round(16 * scale));
+		ctx.font = `bold ${fontSize}px Arial`;
+		const text = ticketType.toUpperCase();
+		const textWidth = Math.ceil(ctx.measureText(text).width);
+		
+		// Kích thước badge nhỏ gọn hơn
+		const badgeSize = Math.max(20, Math.round(28 * scale));
+		const padding = Math.round(6 * scale);
+		const totalWidth = badgeSize + padding * 2 + textWidth + padding;
+		const totalHeight = Math.max(badgeSize, fontSize + padding * 2);
+		
+		// Đặt badge dính sát cạnh phải avatar
+		let left = Math.round(circleX + circleRadius + gap);
+		let top = Math.round(circleY - totalHeight / 2);
+		const right = left + totalWidth;
+		const bottom = top + totalHeight;
+		const centerY = Math.round((top + bottom) / 2);
+
+		// Giữ trong biên canvas
+		const maxRight = this.displayWidth - Math.round(10 * scale);
+		if (right > maxRight) {
+			const delta = right - maxRight;
+			left -= delta;
+		}
+
+		// Vẽ icon badge tròn bên trái
+		const iconX = left + padding;
+		const iconY = centerY;
+		const iconRadius = badgeSize / 2;
+		
+		// Gradient cho icon theo màu hạng vé
+		const baseColor = this.ticketColors[ticketType] || '#ff3b8a';
+		const iconGrad = ctx.createRadialGradient(iconX, iconY, 0, iconX, iconY, iconRadius);
+		iconGrad.addColorStop(0, this.lightenColor(baseColor, 0.4));
+		iconGrad.addColorStop(0.7, baseColor);
+		iconGrad.addColorStop(1, this.darkenColor(baseColor, 0.3));
+		
+		ctx.save();
+		ctx.fillStyle = iconGrad;
+		ctx.beginPath();
+		ctx.arc(iconX, iconY, iconRadius, 0, 2 * Math.PI);
+		ctx.fill();
+		
+		// Viền neon cho icon
+		ctx.shadowColor = 'rgba(64, 224, 255, 0.8)';
+		ctx.shadowBlur = 6 * scale;
+		ctx.strokeStyle = '#41e6ff';
+		ctx.lineWidth = Math.max(1, Math.round(1.2 * scale));
+		ctx.stroke();
+		
+		// Hiệu ứng gloss cho icon
+		const glossGrad = ctx.createRadialGradient(iconX - iconRadius/3, iconY - iconRadius/3, 0, iconX, iconY, iconRadius);
+		glossGrad.addColorStop(0, 'rgba(255,255,255,0.4)');
+		glossGrad.addColorStop(0.6, 'rgba(255,255,255,0.1)');
+		glossGrad.addColorStop(1, 'rgba(255,255,255,0)');
+		ctx.fillStyle = glossGrad;
+		ctx.fill();
+		ctx.restore();
+
+		// Vẽ text bên phải icon
+		const textX = iconX + iconRadius + padding;
+		ctx.save();
+		ctx.fillStyle = '#FFFFFF';
+		ctx.textAlign = 'left';
+		ctx.textBaseline = 'middle';
+		ctx.font = `bold ${fontSize}px Arial`;
+		ctx.fillText(text, textX, centerY);
+		ctx.restore();
+	 }
     
 
     
     drawFallbackDesign(ctx = this.ctx) {
-        // Fallback design if background image not available
+        // Thiết kế dự phòng khi không có ảnh nền
         const gradient = ctx.createLinearGradient(0, 0, this.displayWidth, this.displayHeight);
         gradient.addColorStop(0, '#FF6B6B');
         gradient.addColorStop(0.5, '#FF8E53');
@@ -593,7 +865,7 @@ class InvitationGenerator {
         ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, this.displayWidth, this.displayHeight);
         
-        // Add some basic text
+        // Một số chữ cơ bản
         ctx.fillStyle = '#FFFFFF';
         ctx.font = 'bold 32px Arial';
         ctx.textAlign = 'center';
@@ -607,48 +879,64 @@ class InvitationGenerator {
         const guestName = this.guestNameInput.value || 'guest';
         const ticketType = this.ticketTypeSelect.value;
         
-        // Create a temporary canvas for high-quality download
+        // Canvas tạm để xuất ảnh chất lượng cao
         const downloadCanvas = document.createElement('canvas');
         const downloadCtx = downloadCanvas.getContext('2d');
         
-        // Set download canvas to high resolution (2x for better quality)
+        // Đặt độ phân giải cao (2x) để ảnh sắc nét hơn
         downloadCanvas.width = this.displayWidth * 2;
         downloadCanvas.height = this.displayHeight * 2;
         
-        // Scale the context to match the original
+        // Scale context tương ứng bản gốc
         downloadCtx.scale(2, 2);
         
-        // Enable high-quality image smoothing
+        // Bật làm mịn ảnh chất lượng cao
         downloadCtx.imageSmoothingEnabled = true;
         downloadCtx.imageSmoothingQuality = 'high';
         
-        // Redraw everything at high resolution
+        // Vẽ lại mọi thứ ở độ phân giải cao
         downloadCtx.clearRect(0, 0, this.displayWidth, this.displayHeight);
         
         if (this.backgroundImage && this.backgroundImage.complete) {
-            // Draw background image at high quality
-            downloadCtx.drawImage(this.backgroundImage, 0, 0, this.displayWidth, this.displayHeight);
-            
-                         // Redraw all elements at high resolution
-             this.drawUserPhotoOnFrame(downloadCtx);
-             this.drawGuestNameOnFrame(downloadCtx);
-             this.drawTicketTypeBadgeOnFrame(downloadCtx);
+            // Khi xuất cũng letterbox giống xem trước
+            const imgW = this.backgroundImage.width;
+            const imgH = this.backgroundImage.height;
+            const scale = Math.min(this.displayWidth / imgW, this.displayHeight / imgH);
+            const drawW = Math.round(imgW * scale);
+            const drawH = Math.round(imgH * scale);
+            const dx = Math.round((this.displayWidth - drawW) / 2);
+            const dy = Math.round((this.displayHeight - drawH) / 2);
+
+            const bgGrad = downloadCtx.createLinearGradient(0, 0, this.displayWidth, this.displayHeight);
+            bgGrad.addColorStop(0, '#0f2b4c');
+            bgGrad.addColorStop(1, '#0a1a30');
+            downloadCtx.fillStyle = bgGrad;
+            downloadCtx.fillRect(0, 0, this.displayWidth, this.displayHeight);
+
+            downloadCtx.drawImage(this.backgroundImage, dx, dy, drawW, drawH);
+
+            const rect = { x: dx, y: dy, width: drawW, height: drawH };
+
+            // Vẽ lại các lớp theo rect ảnh
+            this.drawUserPhotoOnFrame(downloadCtx, rect);
+            this.drawGuestNameOnFrame(downloadCtx, rect);
+            this.drawTicketTypeBadgeOnFrame(downloadCtx, rect);
         } else {
             this.drawFallbackDesign(downloadCtx);
         }
         
         const link = document.createElement('a');
-        link.download = `thiep-moi-beauty-summit-2025-${guestName}-${ticketType}.png`;
+        link.download = `Thiep-Moi-TukiGroup-2025-${guestName}-${ticketType}.png`;
         link.href = downloadCanvas.toDataURL('image/png', 1.0);
         
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
         
-        this.showNotification('Thiệp mời đã được tải xuống thành công!');
+        this.showNotification('Thiệp mời đã được tải xuống thành công! Hẹn sớm gặp lại quý khách');
     }
     
-    // Helper functions for color manipulation
+    // Hàm phụ trợ xử lý màu sắc
     darkenColor(color, amount) {
         const num = parseInt(color.replace("#", ""), 16);
         const amt = Math.round(2.55 * amount * 100);
@@ -718,14 +1006,14 @@ class InvitationGenerator {
     }
 }
 
-// Initialize the application when DOM is loaded
+// Khởi tạo ứng dụng khi DOM sẵn sàng
 document.addEventListener('DOMContentLoaded', () => {
     new InvitationGenerator();
 });
 
-// Add some interactive effects
+// Thêm một số hiệu ứng tương tác
 document.addEventListener('DOMContentLoaded', () => {
-    // Parallax effect for background
+    // Hiệu ứng parallax cho nền
     document.addEventListener('mousemove', (e) => {
         const container = document.getElementById('container');
         const x = (e.clientX / window.innerWidth) * 100;
@@ -734,7 +1022,7 @@ document.addEventListener('DOMContentLoaded', () => {
         container.style.backgroundPosition = `${x}% ${y}%`;
     });
     
-    // Add floating animation to form inputs
+    // Hiệu ứng nổi nhẹ cho các input
     const inputs = document.querySelectorAll('.form-input');
     inputs.forEach((input, index) => {
         input.style.animationDelay = `${index * 0.1}s`;

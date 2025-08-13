@@ -26,7 +26,7 @@ body {
     min-height: 700px;
 }
 
-/* Left Panel */
+/* Bên trái */
 .left-panel {
     flex: 1;
     background: linear-gradient(135deg, #8020d9 0%, #c152e9 50%, #186af7 100%);
@@ -57,7 +57,7 @@ body {
 }
 
 .form-group {
-    margin-bottom: 30px;
+    margin-bottom: 10px;
 }
 
 .form-group label {
@@ -77,6 +77,141 @@ body {
     color: #333;
     outline: none;
     transition: all 0.3s ease;
+}
+
+/* Dropdown tuỳ chỉnh (loại vé) */
+.hidden-select {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    height: 0;
+}
+
+.dropdown {
+    position: relative;
+}
+
+.dropdown-toggle {
+    width: 100%;
+    padding: 14px 44px 14px 18px;
+    border: none;
+    border-radius: 25px;
+    font-size: 16px;
+    background: rgba(255, 255, 255, 0.95);
+    color: #333;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid rgba(0,0,0,0.06);
+    position: relative;
+}
+
+.dropdown-label {
+    display: inline-block;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dropdown-toggle::after {
+    content: '';
+    position: absolute;
+    right: 18px;
+    top: 50%;
+    width: 12px;
+    height: 12px;
+    border-right: 2px solid #888;
+    border-bottom: 2px solid #888;
+    transform: translateY(-70%) rotate(45deg);
+    pointer-events: none;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.dropdown[aria-expanded="true"] .dropdown-toggle::after {
+    border-color: #667eea;
+    transform: translateY(-30%) rotate(225deg);
+}
+
+.dropdown-toggle:focus {
+    outline: none;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.25);
+    border-color: #667eea;
+}
+
+.dropdown-menu {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(100% + 8px);
+    background: linear-gradient(180deg, #1e2a5f 0%, #0f1b47 100%);
+    border-radius: 16px;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.08);
+    display: none;
+    z-index: 20;
+    color: #e6edff;
+    backdrop-filter: blur(8px);
+    transform-origin: top;
+    transform: scale(0.98) translateY(-6px);
+    opacity: 0;
+    transition: opacity 120ms ease, transform 120ms ease, background 0.3s ease;
+}
+
+.dropdown[aria-expanded="true"] .dropdown-menu {
+    display: block;
+    opacity: 1;
+    transform: scale(1) translateY(0);
+}
+
+.dropdown-option {
+    padding: 12px 16px;
+    font-size: 16px;
+    line-height: 1.4;
+    cursor: pointer;
+    transition: none;
+    color: #e6edff;
+}
+
+.dropdown-option:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.dropdown-option[aria-selected="true"] {
+    background: linear-gradient(90deg, #5b8cff 0%, #7a5cff 100%);
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.dropdown-option + .dropdown-option {
+    border-top: 1px solid rgba(255,255,255,0.06);
+}
+
+.dropdown-toggle:hover {
+    background: #ffffff;
+    border-color: #7a8cff;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+}
+
+@media (max-width: 768px) {
+    .dropdown-toggle, .dropdown-option {
+        font-size: 15px;
+        padding: 12px 42px 12px 14px;
+        border-radius: 22px;
+    }
+    .dropdown-toggle {
+        line-height: 1.2;
+    }
+}
+
+@media (max-width: 480px) {
+    .dropdown-toggle, .dropdown-option {
+        font-size: 14px;
+        padding: 11px 40px 11px 12px;
+        border-radius: 20px;
+    }
 }
 
 .form-input:focus {
@@ -225,7 +360,7 @@ body {
     box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
 }
 
-/* Photo Upload Styles */
+/* Khu vực tải ảnh lên */
 .photo-upload {
     margin-top: 20px;
     padding: 20px;
@@ -312,7 +447,7 @@ body {
     transform: translateY(-2px);
 }
 
-/* Modal Styles */
+/* Kiểu dáng cho modal */
 .modal {
     position: fixed;
     z-index: 1000;
@@ -322,6 +457,7 @@ body {
     height: 100%;
     background-color: rgba(0, 0, 0, 0.8);
     backdrop-filter: blur(5px);
+    overflow-y: auto;
 }
 
 .modal-content {
@@ -333,10 +469,13 @@ body {
     max-width: 500px;
     position: relative;
     animation: modalSlideIn 0.3s ease-out;
+    max-height: calc(100vh - 60px);
+    overflow-y: auto;
 }
 
 .photo-modal {
-    max-width: 500px;
+    width: min(92vw, 520px);
+    max-width: 520px;
     text-align: center;
 }
 
@@ -377,6 +516,10 @@ body {
     margin: 0 auto 20px;
     background: #fff;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 340px;
+    height: auto;
+    aspect-ratio: 1 / 1;
 }
 
 .crop-controls p {
@@ -394,12 +537,13 @@ body {
     border-radius: 3px;
     background: #ddd;
     outline: none;
+    appearance: none;
     -webkit-appearance: none;
 }
 
 #scaleSlider::-webkit-slider-thumb {
-    -webkit-appearance: none;
     appearance: none;
+    -webkit-appearance: none;
     width: 20px;
     height: 20px;
     border-radius: 50%;
@@ -532,14 +676,15 @@ body {
     }
 }
 
-/* Welcome Modal Styles */
+/* Kiểu dáng modal chào mừng */
 .welcome-modal {
-    background-color: rgba(232, 244, 255, 0.9);
+   /* background-color: rgba(232, 244, 255, 0.9); */
     z-index: 9999;
 }
 
 .welcome-modal-content {
-    max-width: 900px;
+    width: 92vw;
+    max-width: 1000px;
     padding: 30px;
     background: #f8f9fa;
 }
@@ -553,9 +698,10 @@ body {
 }
 
 .welcome-content {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
     gap: 30px;
-    align-items: flex-start;
+    align-items: start;
 }
 
 .frame-preview {
@@ -574,11 +720,10 @@ body {
 
 .welcome-content .instruction-steps {
     flex: 1.5;
-    margin-top: 120px;
+    margin-top: 60px;
 }
 
 .welcome-content .step {
-    margin-bottom: 25px;
     background: #fff;
     border-radius: 15px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
@@ -654,7 +799,7 @@ body {
     font-weight: 500;
 }
 
-/* Close button for welcome modal */
+/* Nút đóng cho modal chào mừng */
 #closeWelcomeModal {
     position: absolute;
     right: 25px;
@@ -678,10 +823,31 @@ body {
     background: rgba(255, 255, 255, 1);
 }
 
-/* Responsive for welcome modal */
-@media (max-width: 768px) {
+/* Responsive cho modal chào mừng */
+@media (max-width: 1200px) {
     .welcome-content {
-        flex-direction: column;
+        grid-template-columns: 1fr 1fr;
+    }
+    .welcome-content .instruction-steps {
+        margin-top: 40px;
+    }
+    .frame-image {
+        max-width: 420px;
+    }
+}
+
+@media (max-width: 768px) {
+    .modal-content.photo-modal {
+        margin: 4% auto;
+        max-height: calc(100vh - 40px);
+        overflow-y: auto;
+    }
+    .photo-modal {
+        width: 94vw;
+        max-width: none;
+    }
+    .welcome-content {
+        grid-template-columns: 1fr;
         gap: 20px;
     }
     
@@ -690,12 +856,51 @@ body {
         max-width: 95%;
         padding: 20px;
     }
+    .frame-image {
+        max-width: 100%;
+    }
+    .welcome-content .instruction-steps {
+        margin-top: 0;
+    }
     
     .welcome-content .step p {
         font-size: 16px;
     }
     
     .welcome-modal-content h2 {
+        font-size: 24px;
+    }
+    #closeWelcomeModal {
+        right: 12px;
+        top: 12px;
+        width: 44px;
+        height: 44px;
+        font-size: 28px;
+    }
+}
+
+@media (max-width: 480px) {
+    .welcome-modal-content {
+        padding: 16px;
+    }
+    .welcome-modal-content h2 {
+        font-size: 20px;
+        margin-bottom: 16px;
+    }
+    .welcome-content .step-number {
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+        margin-right: 12px;
+    }
+    .welcome-content .step p {
+        font-size: 15px;
+    }
+    #closeWelcomeModal {
+        right: 10px;
+        top: 10px;
+        width: 36px;
+        height: 36px;
         font-size: 24px;
     }
 }
@@ -706,7 +911,7 @@ body {
     font-size: 14px;
 }
 
-/* Responsive Design */
+/* Responsive tổng thể */
 @media (max-width: 1024px) {
     #container {
         flex-direction: column;
@@ -728,7 +933,9 @@ body {
     
     #invitationCanvas {
         width: 100%;
-        max-width: 600px;
+        max-width: 650px;
+        height: auto;
+        aspect-ratio: 1/1;
     }
 }
 
@@ -747,7 +954,7 @@ body {
     
     .form-container h2 {
         font-size: 24px;
-        margin-bottom: 30px;
+        margin-bottom: 20px;
     }
     
     .info-box {
@@ -755,7 +962,7 @@ body {
     }
 }
 
-/* Animation for form inputs */
+/* Hiệu ứng cho input của form */
 .form-input {
     animation: slideInLeft 0.6s ease-out;
 }
@@ -786,7 +993,7 @@ body {
     }
 }
 
-/* Canvas container styling */
+/* Kiểu dáng khung chứa canvas */
 .canvas-container {
     position: relative;
     display: inline-block;
@@ -809,29 +1016,14 @@ body {
 #invitationCanvas {
     border-radius: 15px;
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-    max-width: 100%;
+    width: 100%;
+    max-width: 650px;
     height: auto;
+    aspect-ratio: 1 / 1;
     display: block;
 }
 
-.canvas-controls {
-    margin-top: 20px;
-    background: rgba(255, 255, 255, 0.9);
-    border-radius: 15px;
-    padding: 20px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-}
-
-.photo-controls {
-    text-align: center;
-}
-
-.photo-controls h4 {
-    color: #333;
-    margin-bottom: 15px;
-    font-size: 18px;
-    font-weight: 600;
-}
+/* đã xoá block canvas-controls inline theo yêu cầu */
 
 .control-group {
     display: flex;
@@ -858,12 +1050,13 @@ body {
     border-radius: 3px;
     background: #ddd;
     outline: none;
+    appearance: none;
     -webkit-appearance: none;
 }
 
 .control-group input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none;
     appearance: none;
+    -webkit-appearance: none;
     width: 20px;
     height: 20px;
     border-radius: 50%;
@@ -907,30 +1100,14 @@ body {
     box-shadow: 0 5px 15px rgba(255, 152, 0, 0.3);
 }
 
-.edit-btn {
-    background: linear-gradient(45deg, #667eea, #764ba2);
-    color: white;
-    border: none;
-    padding: 12px 25px;
-    border-radius: 20px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    margin-top: 10px;
-}
+/* đã xoá style cho nút edit theo yêu cầu */
 
-.edit-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
-}
-
-/* Remove old invitation-container styles */
+/* Bỏ style cũ của invitation-container */
 .invitation-container {
     display: none;
 }
 
-/* Responsive adjustments for canvas */
+/* Điều chỉnh responsive cho canvas */
 @media (max-width: 1024px) {
     .canvas-container {
         text-align: center;
@@ -939,6 +1116,7 @@ body {
     #invitationCanvas {
         max-width: 100%;
         height: auto;
+        aspect-ratio: 1/1;
     }
     
     .control-group {

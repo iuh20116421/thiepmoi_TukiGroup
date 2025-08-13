@@ -9,7 +9,7 @@
 </head>
 <body>
     <div id="container">
-        <!-- Left side - Form -->
+        <!-- Bên trái - Biểu mẫu -->
         <div class="left-panel">
             <div class="logo">
                 <img src="image/logos.png" alt="Beauty Summit Logo">
@@ -30,30 +30,35 @@
                 
                 <div class="form-group">
                     <label>Chọn hạng vé</label>
-                    <select id="ticketType" class="form-input">
-                        <option value="Silver">AI E-COMMERCE REVOLUTION SILVER</option>
-                        <option value="Gold">AI E-COMMERCE REVOLUTION GOLD</option>
-                        <option value="Diamond">AI E-COMMERCE REVOLUTION DIAMOND</option>
-                        <option value="V.VIP">V.VIP</option>
-                    </select>
+					<!-- Hidden native select for accessibility and logic -->
+					<select id="ticketType" class="form-input select-input hidden-select" tabindex="-1" aria-hidden="true">
+						<option value="Silver">AI E-COMMERCE REVOLUTION SILVER</option>
+						<option value="Gold">AI E-COMMERCE REVOLUTION GOLD</option>
+						<option value="Diamond">AI E-COMMERCE REVOLUTION DIAMOND</option>
+						<option value="V.VIP">V.VIP</option>
+					</select>
+					<!-- Custom dropdown UI -->
+					<div class="dropdown" id="ticketDropdown">
+						<button type="button" class="dropdown-toggle" aria-haspopup="listbox" aria-expanded="false" title="AI E-COMMERCE REVOLUTION SILVER">
+							<span class="dropdown-label">AI E-COMMERCE REVOLUTION SILVER</span>
+						</button>
+						<ul class="dropdown-menu" role="listbox">
+							<li class="dropdown-option" data-value="Silver" data-short="Silver" data-long="AI E-COMMERCE REVOLUTION SILVER" role="option" aria-selected="true" title="AI E-COMMERCE REVOLUTION SILVER">AI E-COMMERCE REVOLUTION SILVER</li>
+							<li class="dropdown-option" data-value="Gold" data-short="Gold" data-long="AI E-COMMERCE REVOLUTION GOLD" role="option" title="AI E-COMMERCE REVOLUTION GOLD">AI E-COMMERCE REVOLUTION GOLD</li>
+							<li class="dropdown-option" data-value="Diamond" data-short="Diamond" data-long="AI E-COMMERCE REVOLUTION DIAMOND" role="option" title="AI E-COMMERCE REVOLUTION DIAMOND">AI E-COMMERCE REVOLUTION DIAMOND</li>
+							<li class="dropdown-option" data-value="V.VIP" data-short="V.VIP" data-long="V.VIP" role="option" title="V.VIP">V.VIP</li>
+						</ul>
+					</div>
                 </div>
                 
                 <button id="generateInvitation" class="generate-btn">Chỉnh sửa ảnh</button>
             </div>
         </div>
         
-        <!-- Right side - Canvas Preview -->
+        <!-- Bên phải - Xem trước canvas -->
         <div class="right-panel">
             <div class="canvas-container">
-                <canvas id="invitationCanvas" width="800" height="600"></canvas>
-                
-                <div class="canvas-controls">
-                    <div class="photo-controls" id="photoControls" style="display: none;">
-                        <h4>Điều chỉnh ảnh</h4>
-                        <p>Để điều chỉnh ảnh, hãy nhấn "Chỉnh sửa ảnh" để mở modal chỉnh sửa</p>
-                        <button id="editPhotoBtn" class="edit-btn">Chỉnh sửa ảnh</button>
-                    </div>
-                </div>
+                <canvas id="invitationCanvas" width="650" height="650"></canvas>
                 
                 <div class="info-box">
                     <h3>AI E-COMMERCE REVOLUTION</h3>
@@ -72,7 +77,7 @@
             
             <button id="downloadInvitation" class="download-btn">Tải thiệp mời</button>
             
-            <!-- Instructions Modal -->
+            <!-- Nút mở hướng dẫn -->
             <button id="showInstructions" class="instructions-btn">Hướng dẫn tạo thiệp mời</button>
             
             <div class="footer-info">
@@ -81,9 +86,9 @@
         </div>
     </div>
     
-    <!-- Modals -->
-    <!-- Welcome Instructions Modal -->
-    <div id="welcomeModal" class="modal welcome-modal" style="display: none;">
+    <!-- Các cửa sổ (modal) -->
+    <!-- Cửa sổ chào mừng + hướng dẫn -->
+    <div id="welcomeModal" class="modal " style="display: none;">
         <div class="modal-content welcome-modal-content">
             <span class="close" id="closeWelcomeModal">&times;</span>
             <h2>Hướng dẫn tạo thiệp mời sự kiện!</h2>
@@ -111,7 +116,7 @@
         </div>
     </div>
     
-    <!-- Photo Upload Modal -->
+    <!-- Cửa sổ tải ảnh lên + cắt ảnh -->
     <div id="photoModal" class="modal" style="display: none;">
         <div class="modal-content photo-modal">
             <span class="close">&times;</span>
