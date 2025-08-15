@@ -6,7 +6,7 @@
 
 body {
     font-family: 'Roboto', sans-serif;
-    background: radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.4) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.4) 0%, transparent 50%), radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.3) 0%, transparent 50%), radial-gradient(circle at 60% 60%, rgba(240, 147, 251, 0.2) 0%, transparent 50%), linear-gradient(135deg, #081c909c 0%, #2a2a96 15%, #1f3b86 30%, #0f3460 50%, #533483 70%, #7209b7 85%, #3a0ca3 100%);
+    background: radial-gradient(circle at 25% 25%, rgba(0, 150, 255, 0.3) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(255, 0, 150, 0.3) 0%, transparent 50%), radial-gradient(circle at 50% 50%, rgba(0, 255, 200, 0.2) 0%, transparent 50%), linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #480101 100%);
     min-height: 100vh;
     display: flex;
     align-items: center;
@@ -74,7 +74,7 @@ body::after {
 
 /* Bên trái */
 .left-panel {
-    margin-top: 80px;
+    margin-top: 10px;
     flex: 1;
     background: transparent;
     padding: 20px;
@@ -154,6 +154,8 @@ body::after {
 
 /* Dropdown tuỳ chỉnh (loại vé) */
 .hidden-select {
+    margin-left: ;
+    width: 10px;
     position: absolute;
     opacity: 0;
     pointer-events: none;
@@ -232,15 +234,13 @@ body::after {
     color: #e6edff;
     backdrop-filter: blur(8px);
     transform-origin: top;
-    transform: scale(0.98) translateY(-6px);
-    opacity: 0;
-    transition: opacity 120ms ease, transform 120ms ease, background 0.3s ease;
+    transform: scale(1) translateY(0);
+    opacity: 1;
+    transition: none;
 }
 
 .dropdown[aria-expanded="true"] .dropdown-menu {
     display: block;
-    opacity: 1;
-    transform: scale(1) translateY(0);
 }
 
 .dropdown-option {
@@ -596,7 +596,7 @@ body::after {
 }
 
 .reset-btn {
-    background: linear-gradient(45deg, #ff9800, #ff5722);
+    background: linear-gradient(45deg, #eba01f, #ff5722);
     color: white;
 }
 
@@ -606,7 +606,7 @@ body::after {
 }
 
 .save-btn {
-    background: linear-gradient(45deg, #04a91f, #2fe95d);
+    background: linear-gradient(45deg, #039623, #30f761);
     color: white;
 }
 
@@ -691,7 +691,8 @@ body::after {
 }
 
 .crop-controls p {
-    color: #666;
+    font-weight: 600;
+    color: #0319a2f5;
     font-size: 14px;
     margin-bottom: 15px;
     text-align: center;
@@ -1139,8 +1140,6 @@ body::after {
 .canvas-container::before {
     content: '';
     position: absolute;
-    top: -10px;
-    left: -10px;
     right: -10px;
     bottom: -10px;
     background: 
@@ -1228,8 +1227,6 @@ body::after {
 }
 
 
-
-/* đã xoá style cho nút edit theo yêu cầu */
 
 /* Bỏ style cũ của invitation-container */
 .invitation-container {

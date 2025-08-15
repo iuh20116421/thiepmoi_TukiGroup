@@ -47,10 +47,9 @@ class InvitationGenerator {
         
         // Màu theo hạng vé
         this.ticketColors = {
-            'Silver': '#C0C0C0',
+            'Silver': '#E8E8E8',
             'Gold': '#FFD700',
-            'Diamond': '#4169E1',
-            'V.VIP': '#FF6B35'
+            'Diamond': '#00BFFF'
         };
         
         this.initializeCanvas();
@@ -660,45 +659,42 @@ class InvitationGenerator {
             // Draw glowing blue border effect for uploaded avatar
             ctx.save();
             
-                         // Tạo hiệu ứng viền sáng xanh neon như trong ảnh mẫu
-             const glowLayers = [
-                 { radius: circleRadius + 20, alpha: 0.05, color: '#00BFFF' },
-                 { radius: circleRadius + 15, alpha: 0.1, color: '#00BFFF' },
-                 { radius: circleRadius + 10, alpha: 0.15, color: '#00BFFF' },
-                 { radius: circleRadius + 6, alpha: 0.2, color: '#00BFFF' },
-                 { radius: circleRadius + 3, alpha: 0.3, color: '#00BFFF' },
-                 { radius: circleRadius + 1, alpha: 0.4, color: '#00BFFF' }
-             ];
+                         // Tạo hiệu ứng viền neon với glow mờ nhòe dần cho tất cả 3 viền
              
-             // Vẽ các lớp sáng từ ngoài vào trong để tạo hiệu ứng glow mềm mại
-             glowLayers.forEach(layer => {
-                 ctx.shadowColor = layer.color;
-                 ctx.shadowBlur = 25;
-                 ctx.shadowOffsetX = 0;
-                 ctx.shadowOffsetY = 0;
-                 
-                 ctx.fillStyle = `rgba(0, 191, 255, ${layer.alpha})`;
-                 ctx.beginPath();
-                 ctx.arc(circleX, circleY, layer.radius, 0, Math.PI * 2);
-                 ctx.fill();
-             });
+             // 1. Vẽ viền neon xanh bên ngoài với glow
+             ctx.shadowColor = '#00BFFF';
+             ctx.shadowBlur = 40;
+             ctx.shadowOffsetX = 0;
+             ctx.shadowOffsetY = 0;
              
-             // Xoá shadow cho vòng tròn chính
-             ctx.shadowColor = 'transparent';
-             ctx.shadowBlur = 0;
-             
-             // Vẽ viền sáng chính với độ dày vừa phải
              ctx.strokeStyle = '#00BFFF';
-             ctx.lineWidth = 3;
+             ctx.lineWidth = 1.6;
              ctx.beginPath();
-             ctx.arc(circleX, circleY, circleRadius, 0, Math.PI * 2);
+             ctx.arc(circleX, circleY, circleRadius + 3.5, 0, Math.PI * 2);
              ctx.stroke();
              
-             // Thêm viền sáng bên trong để tăng độ sâu
-             ctx.strokeStyle = 'rgba(0, 191, 255, 0.7)';
-             ctx.lineWidth = 1.5;
+             // 2. Vẽ vòng tròn chính màu trắng với glow
+             ctx.shadowColor = '#FFFFFF';
+             ctx.shadowBlur = 35;
+             ctx.shadowOffsetX = 0;
+             ctx.shadowOffsetY = 0;
+             
+             ctx.strokeStyle = '#FFFFFF';
+             ctx.lineWidth = 1.6;
              ctx.beginPath();
-             ctx.arc(circleX, circleY, circleRadius - 1, 0, Math.PI * 2);
+             ctx.arc(circleX, circleY, circleRadius + 2.5, 0, Math.PI * 2);
+             ctx.stroke();
+             
+             // 3. Vẽ viền neon xanh bên trong với glow - vừa chạm viền avatar
+             ctx.shadowColor = '#00BFFF';
+             ctx.shadowBlur = 40;
+             ctx.shadowOffsetX = 0;
+             ctx.shadowOffsetY = 0;
+             
+             ctx.strokeStyle = '#00BFFF';
+             ctx.lineWidth = 1.6;
+             ctx.beginPath();
+             ctx.arc(circleX, circleY, circleRadius +1.5, 0, Math.PI * 2);
              ctx.stroke();
             
             ctx.restore();
@@ -804,24 +800,59 @@ class InvitationGenerator {
 		const textX = circleX;
 		const textY = circleY + circleRadius + Math.round(15 * scale); // Khoảng cách 15px dưới avatar
 		
-		// Vẽ text với hiệu ứng gradient và glow
 		ctx.save();
 		
-		// Tạo gradient cho text theo màu hạng vé
+		// Tạo hiệu ứng 3D shadow - vẽ nhiều lớp shadow để tạo độ sâu
+		const shadowLayers = 8;
+		const maxShadowOffset = 6 * scale;
+		const shadowColor = 'rgba(0, 0, 0, 0.3)';
+		
+		// Vẽ các lớp shadow từ xa đến gần để tạo hiệu ứng 3D
+		for (let i = shadowLayers; i > 0; i--) {
+			const shadowOffset = (i / shadowLayers) * maxShadowOffset;
+			const shadowOpacity = (i / shadowLayers) * 0.3;
+			
+			ctx.shadowColor = `rgba(0, 0, 0, ${shadowOpacity})`;
+			ctx.shadowBlur = 2 * scale;
+			ctx.shadowOffsetX = shadowOffset;
+			ctx.shadowOffsetY = shadowOffset;
+			
+			ctx.fillStyle = this.ticketColors[ticketType] || '#ff3b8a';
+			ctx.textAlign = 'center';
+			ctx.textBaseline = 'middle';
+			ctx.font = `bold ${fontSize}px Arial`;
+			ctx.fillText(text, textX, textY);
+		}
+		
+		// Thêm hiệu ứng phát sáng (glow) trước khi vẽ text chính
 		const baseColor = this.ticketColors[ticketType] || '#ff3b8a';
+		const glowColor = this.lightenColor(baseColor, 0.4);
+		
+		ctx.shadowColor = glowColor;
+		ctx.shadowBlur = 3 * scale;
+		ctx.shadowOffsetX = 0;
+		ctx.shadowOffsetY = 0;
+		
+		ctx.fillStyle = baseColor;
+		ctx.textAlign = 'center';
+		ctx.textBaseline = 'middle';
+		ctx.font = `bold ${fontSize}px Arial`;
+		ctx.fillText(text, textX, textY);
+		
+		// Vẽ text chính với hiệu ứng gradient
 		const textGrad = ctx.createLinearGradient(textX - textWidth/2, textY - fontSize/2, textX + textWidth/2, textY + fontSize/2);
 		textGrad.addColorStop(0, this.lightenColor(baseColor, 0.6));
 		textGrad.addColorStop(0.3, this.lightenColor(baseColor, 0.3));
 		textGrad.addColorStop(0.7, baseColor);
 		textGrad.addColorStop(1, this.darkenColor(baseColor, 0.4));
 		
-		// Viền neon cyan xung quanh text
-		ctx.shadowColor = 'rgba(64, 224, 255, 0.8)';
-		ctx.shadowBlur = 6 * scale;
+		// Xóa shadow cho text chính
+		ctx.shadowColor = 'transparent';
+		ctx.shadowBlur = 0;
 		ctx.shadowOffsetX = 0;
 		ctx.shadowOffsetY = 0;
 		
-		// Vẽ text với gradient
+		// Vẽ text chính với gradient
 		ctx.fillStyle = textGrad;
 		ctx.textAlign = 'center';
 		ctx.textBaseline = 'middle';
@@ -832,8 +863,6 @@ class InvitationGenerator {
 		const glossGrad = ctx.createLinearGradient(textX - textWidth/2, textY - fontSize/2, textX + textWidth/2, textY + fontSize/2);
 		glossGrad.addColorStop(0, 'rgba(255,255,255,0.6)');
 		glossGrad.addColorStop(0.3, 'rgba(255,255,255,0.3)');
-		glossGrad.addColorStop(0.7, 'rgba(255,255,255,0.1)');
-		glossGrad.addColorStop(1, 'rgba(255,255,255,0)');
 		
 		ctx.fillStyle = glossGrad;
 		ctx.fillText(text, textX, textY);
