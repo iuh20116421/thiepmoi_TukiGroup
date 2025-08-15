@@ -857,7 +857,7 @@ class InvitationGenerator {
         ctx.fillStyle = '#FFFFFF';
         ctx.font = 'bold 32px Arial';
         ctx.textAlign = 'center';
-        ctx.fillText('BEAUTY SUMMIT 2025', this.displayWidth/2, this.displayHeight/2);
+        ctx.fillText('AI E-COMMERCE REVOLUTION', this.displayWidth/2, this.displayHeight/2);
         
         ctx.font = '18px Arial';
         ctx.fillText('Thiệp mời sự kiện', this.displayWidth/2, this.displayHeight/2 + 50);
