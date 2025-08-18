@@ -83,7 +83,7 @@ body::after {
     align-items: center;
     color: #ffffff;
     position: relative;
-    z-index: 1;
+    z-index: 999;
 }
 
 .logo img {
@@ -111,6 +111,8 @@ body::after {
 .form-container {
     width: 100%;
     max-width: 400px;
+    position: relative;
+    z-index: 999;
 }
 
 .form-container h2 {
@@ -164,6 +166,7 @@ body::after {
 
 .dropdown {
     position: relative;
+    z-index: 999;
 }
 
 .dropdown-toggle {
@@ -230,7 +233,7 @@ body::after {
     overflow: hidden;
     border: 1px solid rgba(255,255,255,0.08);
     display: none;
-    z-index: 20;
+    z-index: 999;
     color: #e6edff;
     backdrop-filter: blur(8px);
     transform-origin: top;
@@ -373,7 +376,7 @@ body::after {
     flex-direction: column;
     align-items: center;
     position: relative;
-    z-index: 1;
+    z-index: 0;
 }
 
 .info-box {
@@ -510,7 +513,7 @@ body::after {
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
 
 .instructions-btn:hover {
@@ -618,7 +621,7 @@ body::after {
 /* Kiểu dáng cho modal */
 .modal {
     position: fixed;
-    z-index: 1000;
+    z-index: 99999;
     left: 0;
     top: 0;
     width: 100%;
@@ -814,7 +817,7 @@ body::after {
 /* Kiểu dáng modal chào mừng */
 .welcome-modal {
    /* background-color: rgba(232, 244, 255, 0.9); */
-    z-index: 9999;
+    z-index: 999999;
 }
 
 .welcome-modal-content {
@@ -822,6 +825,8 @@ body::after {
     max-width: 1000px;
     padding: 30px;
     background: #f8f9fa;
+    position: relative;
+    z-index: 999999;
 }
 
 .welcome-modal-content h2 {
