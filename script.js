@@ -58,12 +58,16 @@ class InvitationGenerator {
     }
     
     initializeCanvas() {
+        // Kiểm tra nếu là mobile để tối ưu performance
+        const isMobile = window.innerWidth <= 768;
+        
         // Thiết lập High-DPI để ảnh vẽ sắc nét
         const devicePixelRatioValue = window.devicePixelRatio || 1;
 
-        // Kích thước vẽ logic cố định 650x650
-        this.canvas.width = 650 * devicePixelRatioValue;
-        this.canvas.height = 650 * devicePixelRatioValue;
+        // Kích thước vẽ logic - giảm kích thước trên mobile để tăng tốc
+        const canvasSize = isMobile ? 400 : 650;
+        this.canvas.width = canvasSize * devicePixelRatioValue;
+        this.canvas.height = canvasSize * devicePixelRatioValue;
 
         // Xoá kích thước CSS inline để không phá vỡ responsive
         this.canvas.style.width = '';
@@ -73,8 +77,14 @@ class InvitationGenerator {
         this.ctx.setTransform(devicePixelRatioValue, 0, 0, devicePixelRatioValue, 0, 0);
 
         // Kích thước vẽ logic
-        this.displayWidth = 650;
-        this.displayHeight = 650;
+        this.displayWidth = canvasSize;
+        this.displayHeight = canvasSize;
+
+        // Tối ưu canvas context cho mobile
+        if (isMobile) {
+            this.ctx.imageSmoothingEnabled = true;
+            this.ctx.imageSmoothingQuality = 'medium';
+        }
 
         // Có thể cập nhật lại neo avatar/badge nếu cần khi responsive
         this.updateAvatarPosition();
@@ -391,14 +401,28 @@ class InvitationGenerator {
     }
     
     loadBackgroundImage() {
+        // Kiểm tra nếu là mobile để tối ưu performance
+        const isMobile = window.innerWidth <= 768;
+        
         this.backgroundImage = new Image();
         this.backgroundImage.onload = () => {
-            this.generateInvitation();
+            // Delay nhỏ trên mobile để tránh blocking UI
+            if (isMobile) {
+                setTimeout(() => this.generateInvitation(), 50);
+            } else {
+                this.generateInvitation();
+            }
         };
         this.backgroundImage.onerror = () => {
-            console.warn('frameEvents.jpg not found, using fallback design');
+            console.warn('ThiepMoi.png not found, using fallback design');
             this.generateInvitation();
         };
+        
+        // Tối ưu loading cho mobile
+        if (isMobile) {
+            this.backgroundImage.crossOrigin = 'anonymous';
+        }
+        
         this.backgroundImage.src = 'image/ThiepMoi.png';
     }
     
@@ -771,13 +795,16 @@ class InvitationGenerator {
     }
     
     generateInvitation() {
+        // Kiểm tra nếu là mobile để tối ưu performance
+        const isMobile = window.innerWidth <= 768;
+        
         // Clear canvas using display dimensions
         this.ctx.clearRect(0, 0, this.displayWidth, this.displayHeight);
         
         if (this.backgroundImage && this.backgroundImage.complete) {
-            // Draw background image with high quality scaling
+            // Draw background image with optimized quality for mobile
             this.ctx.imageSmoothingEnabled = true;
-            this.ctx.imageSmoothingQuality = 'high';
+            this.ctx.imageSmoothingQuality = isMobile ? 'medium' : 'high';
 
             // Letterbox-fit the background into the square canvas (object-fit: contain)
             const imgW = this.backgroundImage.width;
@@ -801,10 +828,19 @@ class InvitationGenerator {
             // Store rect for overlays
             this.designRect = { x: dx, y: dy, width: drawW, height: drawH };
 
-            // Draw overlays relative to image rect
-            this.drawUserPhotoOnFrame(this.ctx, this.designRect);
-            this.drawGuestNameOnFrame(this.ctx, this.designRect);
-            this.drawTicketTypeBadgeOnFrame(this.ctx, this.designRect);
+            // Draw overlays relative to image rect with mobile optimization
+            if (isMobile) {
+                // Batch drawing operations for mobile
+                requestAnimationFrame(() => {
+                    this.drawUserPhotoOnFrame(this.ctx, this.designRect);
+                    this.drawGuestNameOnFrame(this.ctx, this.designRect);
+                    this.drawTicketTypeBadgeOnFrame(this.ctx, this.designRect);
+                });
+            } else {
+                this.drawUserPhotoOnFrame(this.ctx, this.designRect);
+                this.drawGuestNameOnFrame(this.ctx, this.designRect);
+                this.drawTicketTypeBadgeOnFrame(this.ctx, this.designRect);
+            }
         } else {
             // Fallback design if background image not loaded
             this.drawFallbackDesign();

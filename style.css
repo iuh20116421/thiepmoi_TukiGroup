@@ -1481,13 +1481,21 @@ body {
     z-index: 2;
     border-radius: 10px !important;
     overflow: hidden !important;
+    /* Tối ưu performance cho mobile */
+    will-change: auto;
+    transform: translateZ(0);
+    backface-visibility: hidden;
 }
 
 /* Đảm bảo canvas có border-radius */
 #invitationCanvas {
     border-radius: 15px !important;
-    -webkit-border-radius: 10px !important;
-    -moz-border-radius: 10px !important;
+    -webkit-border-radius: 15px !important;
+    -moz-border-radius: 15px !important;
+    /* Tối ưu performance cho mobile */
+    will-change: auto;
+    transform: translateZ(0);
+    backface-visibility: hidden;
 }
 
 /* Ẩn hiệu ứng sao và gợn sóng trong canvas-container */
@@ -1648,10 +1656,14 @@ body {
     
     #invitationCanvas {
         width: 100% !important;
-        max-width: 350px !important;
+        max-width: 300px !important;
         height: auto !important;
         aspect-ratio: 1/1;
         border-radius: 10px !important;
+        /* Tối ưu performance cho mobile */
+        will-change: auto !important;
+        transform: translateZ(0) !important;
+        backface-visibility: hidden !important;
     }
     
     .form-container {
