@@ -363,7 +363,14 @@ body {
 /* Cải thiện trải nghiệm kéo ảnh */
 #cropCanvas {
     cursor: grab;
-    transition: cursor 0.2s ease;
+    transition: all 0.2s ease;
+    touch-action: none !important; /* Ngăn chặn scroll và zoom trên mobile */
+    user-select: none !important; /* Ngăn chặn select text */
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
+    -webkit-touch-callout: none !important; /* Ngăn chặn callout trên iOS */
+    -webkit-tap-highlight-color: transparent !important; /* Ngăn chặn highlight khi tap */
 }
 
 #cropCanvas:hover {
@@ -937,7 +944,7 @@ body {
 }
 
 .cancel-btn {
-    background: linear-gradient(45deg, #9f0707, #fa3126);
+    background: #161336;
     color: white;
 }
 
@@ -1409,12 +1416,12 @@ body {
     }
     
     #invitationCanvas {
-    width: 100%;
-    max-width: 900px;
-    height: auto;
-    aspect-ratio: 1/1;
-    border-radius: 15px !important;
-}
+        width: 100%;
+        max-width: 2500px;
+        height: auto;
+        aspect-ratio: 1/1;
+        border-radius: 15px !important;
+    }
 }
 
 @media (max-width: 768px) {
@@ -1538,7 +1545,7 @@ body {
     border-radius: 15px;
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
     width: 100%;
-    max-width: 900px;
+    max-width: 2500px;
     height: auto;
     aspect-ratio: 1 / 1;
     display: block;
@@ -1656,7 +1663,7 @@ body {
     
     #invitationCanvas {
         width: 100% !important;
-        max-width: 300px !important;
+        max-width: 600px !important;
         height: auto !important;
         aspect-ratio: 1/1;
         border-radius: 10px !important;
@@ -1730,6 +1737,23 @@ body {
         width: 100% !important;
         max-width: 250px !important;
         height: auto !important;
+        touch-action: none !important;
+        cursor: grab !important;
+        user-select: none !important;
+        -webkit-user-select: none !important;
+        -moz-user-select: none !important;
+        -ms-user-select: none !important;
+        -webkit-touch-callout: none !important;
+        -webkit-tap-highlight-color: transparent !important;
+        transition: all 0.2s ease !important;
+    }
+    
+    #cropCanvas.dragging {
+        cursor: grabbing !important;
+        transform: scale(1.02) !important;
+        transition: transform 0.1s ease !important;
+        touch-action: none !important;
+        box-shadow: 0 0 20px rgba(0, 191, 255, 0.3) !important;
     }
     
     .crop-controls {
@@ -1794,7 +1818,7 @@ body {
     
     #invitationCanvas {
         width: 100% !important;
-        max-width: 700px !important;
+        max-width: 1200px !important;
         height: auto !important;
         aspect-ratio: 1/1;
         border-radius: 10px !important;

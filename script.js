@@ -44,6 +44,7 @@ class InvitationGenerator {
         
         // Trạng thái nội bộ
         this.isFileDialogOpen = false;
+        this.isTouchDevice = this.detectTouchDevice();
         
         // Màu theo hạng vé
         this.ticketColors = {
@@ -57,6 +58,10 @@ class InvitationGenerator {
         this.loadBackgroundImage();
     }
     
+    detectTouchDevice() {
+        return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    }
+    
     initializeCanvas() {
         // Kiểm tra nếu là mobile để tối ưu performance
         const isMobile = window.innerWidth <= 768;
@@ -64,8 +69,8 @@ class InvitationGenerator {
         // Thiết lập High-DPI để ảnh vẽ sắc nét
         const devicePixelRatioValue = window.devicePixelRatio || 1;
 
-        // Kích thước vẽ logic - tăng lên 900x900 cho desktop, giữ 400x400 cho mobile
-        const canvasSize = isMobile ? 400 : 900;
+        // Kích thước vẽ logic - tăng lên 2500x2500 cho desktop, tối ưu cho mobile
+        const canvasSize = isMobile ? 800 : 2500;
         this.canvas.width = canvasSize * devicePixelRatioValue;
         this.canvas.height = canvasSize * devicePixelRatioValue;
 
@@ -80,11 +85,17 @@ class InvitationGenerator {
         this.displayWidth = canvasSize;
         this.displayHeight = canvasSize;
 
-        // Tối ưu canvas context cho mobile
+        // Tối ưu canvas context cho kích thước lớn
+        this.ctx.imageSmoothingEnabled = true;
         if (isMobile) {
-            this.ctx.imageSmoothingEnabled = true;
             this.ctx.imageSmoothingQuality = 'medium';
+        } else {
+            this.ctx.imageSmoothingQuality = 'high';
         }
+
+        // Tối ưu performance cho canvas lớn
+        this.ctx.globalCompositeOperation = 'source-over';
+        this.ctx.globalAlpha = 1.0;
 
         // Có thể cập nhật lại neo avatar/badge nếu cần khi responsive
         this.updateAvatarPosition();
@@ -423,7 +434,7 @@ class InvitationGenerator {
             this.backgroundImage.crossOrigin = 'anonymous';
         }
         
-        this.backgroundImage.src = 'image/ThiepMoi.png';
+        this.backgroundImage.src = 'image/frameNew.jpg';
     }
     
     openPhotoModal() {
@@ -744,8 +755,11 @@ class InvitationGenerator {
     setupCropCanvasEvents() {
         let isDragging = false;
         let lastMousePos = { x: 0, y: 0 };
+        let isTouchDevice = this.isTouchDevice;
         
+        // Desktop mouse events
         this.cropCanvas.addEventListener('mousedown', (e) => {
+            if (isTouchDevice) return; // Bỏ qua mouse events trên touch device
             isDragging = true;
             this.cropCanvas.style.cursor = 'grabbing';
             const rect = this.cropCanvas.getBoundingClientRect();
@@ -759,6 +773,7 @@ class InvitationGenerator {
         });
         
         this.cropCanvas.addEventListener('mousemove', (e) => {
+            if (isTouchDevice) return; // Bỏ qua mouse events trên touch device
             if (isDragging && this.photoImage) {
                 const rect = this.cropCanvas.getBoundingClientRect();
                 const mousePos = {
@@ -778,17 +793,87 @@ class InvitationGenerator {
             }
         });
         
-        this.cropCanvas.addEventListener('mouseup', () => {
+        this.cropCanvas.addEventListener('mouseup', (e) => {
+            if (isTouchDevice) return; // Bỏ qua mouse events trên touch device
             isDragging = false;
             this.cropCanvas.style.cursor = 'grab';
             this.cropCanvas.classList.remove('dragging');
         });
         
-        this.cropCanvas.addEventListener('mouseleave', () => {
+        this.cropCanvas.addEventListener('mouseleave', (e) => {
+            if (isTouchDevice) return; // Bỏ qua mouse events trên touch device
             isDragging = false;
             this.cropCanvas.style.cursor = 'default';
             this.cropCanvas.classList.remove('dragging');
         });
+
+        // Mobile touch events - Cải thiện để hoạt động tốt hơn
+        this.cropCanvas.addEventListener('touchstart', (e) => {
+            e.preventDefault(); // Ngăn chặn zoom
+            e.stopPropagation(); // Ngăn chặn event bubbling
+            isTouchDevice = true;
+            isDragging = true;
+            
+            const rect = this.cropCanvas.getBoundingClientRect();
+            const touch = e.touches[0];
+            lastMousePos = {
+                x: touch.clientX - rect.left,
+                y: touch.clientY - rect.top
+            };
+            
+            // Thêm class để hiển thị trạng thái đang kéo
+            this.cropCanvas.classList.add('dragging');
+            
+            // Thêm visual feedback
+            this.cropCanvas.style.transform = 'scale(1.02)';
+            
+            // Log để debug
+            console.log('Touch start detected on mobile');
+        }, { passive: false });
+        
+        this.cropCanvas.addEventListener('touchmove', (e) => {
+            e.preventDefault(); // Ngăn chặn scroll
+            e.stopPropagation(); // Ngăn chặn event bubbling
+            
+            if (isDragging && this.photoImage) {
+                const rect = this.cropCanvas.getBoundingClientRect();
+                const touch = e.touches[0];
+                const touchPos = {
+                    x: touch.clientX - rect.left,
+                    y: touch.clientY - rect.top
+                };
+                
+                // Cập nhật vị trí theo cả hai chiều
+                this.photoPositionX += touchPos.x - lastMousePos.x;
+                this.photoPositionY += touchPos.y - lastMousePos.y;
+                
+                lastMousePos = touchPos;
+                this.updateCropPreview();
+                
+                // Log để debug
+                console.log('Touch move - Position:', { x: this.photoPositionX, y: this.photoPositionY });
+            }
+        }, { passive: false });
+        
+        this.cropCanvas.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            isDragging = false;
+            this.cropCanvas.classList.remove('dragging');
+            
+            // Reset visual feedback
+            this.cropCanvas.style.transform = 'scale(1)';
+        }, { passive: false });
+        
+        this.cropCanvas.addEventListener('touchcancel', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            isDragging = false;
+            this.cropCanvas.classList.remove('dragging');
+            
+            // Reset visual feedback
+            this.cropCanvas.style.transform = 'scale(1)';
+        }, { passive: false });
 
         // Recompute preview center on resize to keep avatar centered
         window.addEventListener('resize', () => this.updateCropPreview());
@@ -802,7 +887,7 @@ class InvitationGenerator {
         this.ctx.clearRect(0, 0, this.displayWidth, this.displayHeight);
         
         if (this.backgroundImage && this.backgroundImage.complete) {
-            // Draw background image with optimized quality for mobile
+            // Draw background image with optimized quality for large canvas
             this.ctx.imageSmoothingEnabled = true;
             this.ctx.imageSmoothingQuality = isMobile ? 'medium' : 'high';
 
@@ -828,18 +913,21 @@ class InvitationGenerator {
             // Store rect for overlays
             this.designRect = { x: dx, y: dy, width: drawW, height: drawH };
 
-            // Draw overlays relative to image rect with mobile optimization
+            // Draw overlays relative to image rect with performance optimization
             if (isMobile) {
-                // Batch drawing operations for mobile
+                // Batch drawing operations for mobile with large canvas
                 requestAnimationFrame(() => {
                     this.drawUserPhotoOnFrame(this.ctx, this.designRect);
                     this.drawGuestNameOnFrame(this.ctx, this.designRect);
                     this.drawTicketTypeBadgeOnFrame(this.ctx, this.designRect);
                 });
             } else {
-                this.drawUserPhotoOnFrame(this.ctx, this.designRect);
-                this.drawGuestNameOnFrame(this.ctx, this.designRect);
-                this.drawTicketTypeBadgeOnFrame(this.ctx, this.designRect);
+                // For large desktop canvas, use requestAnimationFrame for smooth rendering
+                requestAnimationFrame(() => {
+                    this.drawUserPhotoOnFrame(this.ctx, this.designRect);
+                    this.drawGuestNameOnFrame(this.ctx, this.designRect);
+                    this.drawTicketTypeBadgeOnFrame(this.ctx, this.designRect);
+                });
             }
         } else {
             // Fallback design if background image not loaded
@@ -1141,35 +1229,36 @@ class InvitationGenerator {
             this.drawFallbackDesign(downloadCtx);
         }
         
-        const dataURL = downloadCanvas.toDataURL('image/png', 1.0);
-        
-        // Kiểm tra xem có phải thiết bị di động không
-        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-        
-        if (isMobile) {
-            // Sử dụng Web Share API để chia sẻ ảnh trực tiếp vào bộ sưu tập ảnh
-            this.downloadForMobile(dataURL, guestName, ticketType);
-        } else {
-            // Tải xuống bình thường cho desktop
-            const link = document.createElement('a');
-            link.download = `Thiep-Moi-TukiGroup-2025-${guestName}-${ticketType}.png`;
-            link.href = dataURL;
+        // Tối ưu cho file lớn - sử dụng blob thay vì dataURL
+        downloadCanvas.toBlob((blob) => {
+            // Kiểm tra xem có phải thiết bị di động không
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
             
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            
-            this.showNotification('Thiệp mời đã được tải xuống thành công! Hẹn sớm gặp lại quý khách');
-        }
+            if (isMobile) {
+                // Sử dụng Web Share API để chia sẻ ảnh trực tiếp vào bộ sưu tập ảnh
+                this.downloadForMobile(blob, guestName, ticketType);
+            } else {
+                // Tải xuống bình thường cho desktop với blob
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.download = `Thiep-Moi-TukiGroup-2025-${guestName}-${ticketType}.png`;
+                link.href = url;
+                
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                // Cleanup blob URL
+                setTimeout(() => URL.revokeObjectURL(url), 1000);
+                
+                this.showNotification('Thiệp mời đã được tải xuống thành công! Hẹn sớm gặp lại quý khách');
+            }
+        }, 'image/png', 1.0);
     }
     
-    async downloadForMobile(dataURL, guestName, ticketType) {
+    async downloadForMobile(blob, guestName, ticketType) {
         try {
-            // Tạo blob từ data URL
-            const response = await fetch(dataURL);
-            const blob = await response.blob();
-            
-            // Tạo file object
+            // Tạo file object từ blob
             const file = new File([blob], `Thiep-Moi-TukiGroup-2025-${guestName}-${ticketType}.png`, {
                 type: 'image/png'
             });
