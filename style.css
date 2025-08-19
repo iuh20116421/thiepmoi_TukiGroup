@@ -1410,7 +1410,7 @@ body {
     
     #invitationCanvas {
     width: 100%;
-    max-width: 650px;
+    max-width: 900px;
     height: auto;
     aspect-ratio: 1/1;
     border-radius: 15px !important;
@@ -1538,7 +1538,7 @@ body {
     border-radius: 15px;
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
     width: 100%;
-    max-width: 650px;
+    max-width: 900px;
     height: auto;
     aspect-ratio: 1 / 1;
     display: block;
@@ -1794,7 +1794,7 @@ body {
     
     #invitationCanvas {
         width: 100% !important;
-        max-width: 500px !important;
+        max-width: 700px !important;
         height: auto !important;
         aspect-ratio: 1/1;
         border-radius: 10px !important;

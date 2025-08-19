@@ -64,8 +64,8 @@ class InvitationGenerator {
         // Thiết lập High-DPI để ảnh vẽ sắc nét
         const devicePixelRatioValue = window.devicePixelRatio || 1;
 
-        // Kích thước vẽ logic - giảm kích thước trên mobile để tăng tốc
-        const canvasSize = isMobile ? 400 : 650;
+        // Kích thước vẽ logic - tăng lên 900x900 cho desktop, giữ 400x400 cho mobile
+        const canvasSize = isMobile ? 400 : 900;
         this.canvas.width = canvasSize * devicePixelRatioValue;
         this.canvas.height = canvasSize * devicePixelRatioValue;
 
