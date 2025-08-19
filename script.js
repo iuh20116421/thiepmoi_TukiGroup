@@ -368,34 +368,6 @@ class InvitationGenerator {
         }
     }
     
-    showDragInstructions() {
-        // Tạo tooltip hướng dẫn kéo chỉnh
-        const tooltip = document.createElement('div');
-        tooltip.className = 'drag-instruction-tooltip';
-        tooltip.innerHTML = `
-            <div class="tooltip-content">
-                <div class="tooltip-icon">👆</div>
-                <div class="tooltip-text">
-                    <strong>Kéo ảnh để điều chỉnh vị trí</strong><br>
-                    <small>Kéo lên/xuống/trái/phải để hiển thị phần mong muốn</small>
-                </div>
-            </div>
-        `;
-        
-        // Thêm vào modal
-        const photoModal = document.getElementById('photoModal');
-        if (photoModal) {
-            photoModal.appendChild(tooltip);
-            
-            // Tự động ẩn sau 5 giây
-            setTimeout(() => {
-                if (tooltip.parentNode) {
-                    tooltip.parentNode.removeChild(tooltip);
-                }
-            }, 9000);
-        }
-    }
-    
     loadBackgroundImage() {
         // Kiểm tra nếu là mobile để tối ưu performance
         const isMobile = window.innerWidth <= 768;
@@ -457,9 +429,6 @@ class InvitationGenerator {
                     
                     this.updateCropPreview();
                     this.isFileDialogOpen = false;
-                    
-                    // Hiển thị hướng dẫn kéo chỉnh
-                    this.showDragInstructions();
                 };
                 this.photoImage.src = e.target.result;
             };
@@ -633,14 +602,14 @@ class InvitationGenerator {
          
          // Vẽ viền sáng chính với độ dày vừa phải
          finalCtx.strokeStyle = '#00BFFF';
-         finalCtx.lineWidth = 3;
+         finalCtx.lineWidth = 4;
          finalCtx.beginPath();
          finalCtx.arc(centerX, centerY, radius, 0, Math.PI * 2);
          finalCtx.stroke();
          
          // Thêm viền sáng bên trong để tăng độ sâu
          finalCtx.strokeStyle = 'rgba(0, 191, 255, 0.7)';
-         finalCtx.lineWidth = 1.5;
+         finalCtx.lineWidth = 2;
          finalCtx.beginPath();
          finalCtx.arc(centerX, centerY, radius - 1, 0, Math.PI * 2);
          finalCtx.stroke();
