@@ -7,6 +7,10 @@
 body {
     font-family: 'Roboto', sans-serif;
     background: radial-gradient(circle at 25% 25%, rgba(0, 150, 255, 0.3) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(255, 0, 150, 0.3) 0%, transparent 50%), radial-gradient(circle at 50% 50%, rgba(0, 255, 200, 0.2) 0%, transparent 50%), linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #480101 100%);
+    background-attachment: fixed;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     min-height: 100vh;
     display: flex;
     align-items: center;
@@ -16,6 +20,7 @@ body {
     overflow-x: hidden;
 }
 
+/* Hiệu ứng ngôi sao chuyển động */
 body::before {
     content: '';
     position: fixed;
@@ -24,40 +29,368 @@ body::before {
     width: 100%;
     height: 100%;
     background: 
-        radial-gradient(2px 2px at 20px 30px, #ffffff, transparent),
-        radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.8), transparent),
-        radial-gradient(1px 1px at 90px 40px, #ffffff, transparent),
-        radial-gradient(1px 1px at 130px 80px, rgba(255,255,255,0.6), transparent),
-        radial-gradient(2px 2px at 160px 30px, #ffffff, transparent),
-        radial-gradient(1px 1px at 200px 50px, rgba(255,255,255,0.7), transparent);
+        radial-gradient(3px 3px at 25px 35px, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.1) 50%, transparent 100%),
+        radial-gradient(2px 2px at 85px 125px, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.08) 60%, transparent 100%),
+        radial-gradient(4px 4px at 145px 85px, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0.12) 40%, transparent 100%),
+        radial-gradient(2.5px 2.5px at 205px 175px, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0.09) 55%, transparent 100%),
+        radial-gradient(3.5px 3.5px at 265px 125px, rgba(255,255,255,0.32) 0%, rgba(255,255,255,0.11) 45%, transparent 100%),
+        radial-gradient(2px 2px at 325px 215px, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.07) 65%, transparent 100%),
+        radial-gradient(4.5px 4.5px at 385px 165px, rgba(255,255,255,0.38) 0%, rgba(255,255,255,0.13) 35%, transparent 100%),
+        radial-gradient(2.8px 2.8px at 445px 255px, rgba(255,255,255,0.26) 0%, rgba(255,255,255,0.08) 58%, transparent 100%),
+        radial-gradient(3.2px 3.2px at 505px 195px, rgba(255,255,255,0.29) 0%, rgba(255,255,255,0.10) 50%, transparent 100%),
+        radial-gradient(2.3px 2.3px at 565px 285px, rgba(255,255,255,0.24) 0%, rgba(255,255,255,0.07) 62%, transparent 100%);
     background-repeat: repeat;
-    background-size: 200px 100px;
-    animation: sparkle 20s linear infinite;
-    opacity: 0.4;
+    background-size: 600px 400px;
+    animation: sparkle 30s linear infinite;
+    opacity: 0.6;
+    filter: blur(0.3px);
     z-index: -1;
 }
 
+/* Hiệu ứng sóng nước chuyển động */
 body::after {
     content: '';
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
+    width: 50%;
     height: 100%;
     background: 
-        linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.03) 50%, transparent 100%);
-    animation: scan 8s ease-in-out infinite;
+        radial-gradient(ellipse 300px 80px at 15% 20%, rgba(64, 156, 255, 0.15) 0%, rgba(64, 156, 255, 0.08) 30%, transparent 60%),
+        radial-gradient(ellipse 250px 60px at 35% 40%, rgba(100, 181, 246, 0.12) 0%, rgba(100, 181, 246, 0.06) 40%, transparent 70%),
+        radial-gradient(ellipse 200px 50px at 55% 60%, rgba(144, 202, 249, 0.10) 0%, rgba(144, 202, 249, 0.05) 35%, transparent 65%),
+        radial-gradient(ellipse 180px 45px at 75% 80%, rgba(179, 229, 252, 0.08) 0%, rgba(179, 229, 252, 0.04) 45%, transparent 75%),
+        radial-gradient(ellipse 220px 55px at 25% 85%, rgba(129, 212, 250, 0.09) 0%, rgba(129, 212, 250, 0.04) 50%, transparent 80%);
+    animation: gentleWave 12s ease-in-out infinite;
     z-index: -1;
 }
 
+/* Animation cho ngôi sao */
 @keyframes sparkle {
     0% { transform: translateY(0px); }
     100% { transform: translateY(-100px); }
 }
 
-@keyframes scan {
-    0%, 100% { transform: translateX(-100%); }
-    50% { transform: translateX(100%); }
+/* Animation cho sóng nước */
+@keyframes waveRipple3D {
+    0% { 
+        transform: scale(1) rotate(0deg) translateZ(0px) translateX(0px) translateY(0px);
+        opacity: 0.4;
+        filter: blur(0px);
+    }
+    12% { 
+        transform: scale(1.08) rotate(1deg) translateZ(5px) translateX(3px) translateY(-2px);
+        opacity: 0.6;
+        filter: blur(0.2px);
+    }
+    25% { 
+        transform: scale(1.15) rotate(-1deg) translateZ(10px) translateX(-5px) translateY(3px);
+        opacity: 0.5;
+        filter: blur(0.4px);
+    }
+    38% { 
+        transform: scale(1.12) rotate(2deg) translateZ(8px) translateX(2px) translateY(-4px);
+        opacity: 0.7;
+        filter: blur(0.1px);
+    }
+    50% { 
+        transform: scale(1.18) rotate(-1.5deg) translateZ(12px) translateX(-3px) translateY(2px);
+        opacity: 0.6;
+        filter: blur(0.5px);
+    }
+    62% { 
+        transform: scale(1.1) rotate(1.5deg) translateZ(7px) translateX(4px) translateY(-1px);
+        opacity: 0.8;
+        filter: blur(0.3px);
+    }
+    75% { 
+        transform: scale(1.2) rotate(-2deg) translateZ(15px) translateX(-2px) translateY(4px);
+        opacity: 0.5;
+        filter: blur(0.6px);
+    }
+    87% { 
+        transform: scale(1.05) rotate(0.5deg) translateZ(3px) translateX(1px) translateY(-1px);
+        opacity: 0.9;
+        filter: blur(0.1px);
+    }
+    100% { 
+        transform: scale(1) rotate(0deg) translateZ(0px) translateX(0px) translateY(0px);
+        opacity: 0.4;
+        filter: blur(0px);
+    }
+}
+
+/* Animation cho sóng nước nhẹ nhàng */
+@keyframes gentleWave {
+    0% {
+        transform: translateY(0px);
+        opacity: 0.3;
+    }
+    25% {
+        transform: translateY(-6px);
+        opacity: 0.5;
+    }
+    50% {
+        transform: translateY(-12px);
+        opacity: 0.4;
+    }
+    75% {
+        transform: translateY(-6px);
+        opacity: 0.6;
+    }
+    100% {
+        transform: translateY(0px);
+        opacity: 0.3;
+    }
+}
+
+/* Thêm div hiệu ứng để đảm bảo hiển thị */
+.star-effect {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    pointer-events: none !important;
+    z-index: 1 !important;
+    background: 
+        radial-gradient(1px 1px at 15px 25px, rgba(255,255,255,0.6), transparent),
+        radial-gradient(1px 1px at 45px 85px, rgba(255,255,255,0.4), transparent),
+        radial-gradient(1px 1px at 75px 35px, rgba(255,255,255,0.7), transparent),
+        radial-gradient(1px 1px at 105px 95px, rgba(255,255,255,0.5), transparent),
+        radial-gradient(1px 1px at 135px 45px, rgba(255,255,255,0.6), transparent),
+        radial-gradient(1px 1px at 165px 105px, rgba(255,255,255,0.4), transparent),
+        radial-gradient(1px 1px at 195px 55px, rgba(255,255,255,0.7), transparent),
+        radial-gradient(1px 1px at 225px 115px, rgba(255,255,255,0.5), transparent),
+        radial-gradient(1px 1px at 255px 65px, rgba(255,255,255,0.6), transparent),
+        radial-gradient(1px 1px at 285px 125px, rgba(255,255,255,0.4), transparent),
+        radial-gradient(1px 1px at 35px 155px, rgba(255,255,255,0.7), transparent),
+        radial-gradient(1px 1px at 65px 175px, rgba(255,255,255,0.5), transparent),
+        radial-gradient(1px 1px at 95px 185px, rgba(255,255,255,0.6), transparent),
+        radial-gradient(1px 1px at 125px 195px, rgba(255,255,255,0.4), transparent),
+        radial-gradient(1px 1px at 155px 205px, rgba(255,255,255,0.7), transparent),
+        radial-gradient(1px 1px at 185px 215px, rgba(255,255,255,0.5), transparent),
+        radial-gradient(1px 1px at 215px 225px, rgba(255,255,255,0.6), transparent),
+        radial-gradient(1px 1px at 245px 235px, rgba(255,255,255,0.4), transparent),
+        radial-gradient(1px 1px at 275px 245px, rgba(255,255,255,0.7), transparent),
+        radial-gradient(1px 1px at 305px 255px, rgba(255,255,255,0.5), transparent);
+    background-repeat: repeat !important;
+    background-size: 320px 280px !important;
+    animation: sparkle 25s linear infinite !important;
+    opacity: 0.6 !important;
+    display: block !important;
+    visibility: visible !important;
+}
+
+.wave-effect {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 50% !important;
+    height: 100% !important;
+    pointer-events: none !important;
+    z-index: 1 !important;
+    background: 
+        radial-gradient(ellipse 300px 80px at 15% 20%, rgba(64, 156, 255, 0.15) 0%, rgba(64, 156, 255, 0.08) 30%, transparent 60%),
+        radial-gradient(ellipse 250px 60px at 35% 40%, rgba(100, 181, 246, 0.12) 0%, rgba(100, 181, 246, 0.06) 40%, transparent 70%),
+        radial-gradient(ellipse 200px 50px at 55% 60%, rgba(144, 202, 249, 0.10) 0%, rgba(144, 202, 249, 0.05) 35%, transparent 65%),
+        radial-gradient(ellipse 180px 45px at 75% 80%, rgba(179, 229, 252, 0.08) 0%, rgba(179, 229, 252, 0.04) 45%, transparent 75%),
+        radial-gradient(ellipse 220px 55px at 25% 85%, rgba(129, 212, 250, 0.09) 0%, rgba(129, 212, 250, 0.04) 50%, transparent 80%);
+    animation: gentleWave 12s ease-in-out infinite !important;
+    display: block !important;
+    visibility: visible !important;
+}
+
+/* Đảm bảo hiệu ứng hiển thị */
+.star-effect,
+.wave-effect {
+    display: block !important;
+    visibility: visible !important;
+}
+
+/* Hiệu ứng mobile - đơn giản hóa */
+@media (max-width: 768px) {
+    body::before {
+        background-size: 150px 75px;
+        animation: sparkle 25s linear infinite;
+    }
+    
+    body::after {
+        animation: scan 10s ease-in-out infinite;
+    }
+}
+
+@media (max-width: 480px) {
+    body::before {
+        background-size: 100px 50px;
+        animation: sparkle 30s linear infinite;
+        opacity: 0.3;
+    }
+    
+    body::after {
+        animation: scan 12s ease-in-out infinite;
+    }
+}
+
+/* Đảm bảo background luôn hiển thị trên tất cả thiết bị */
+html {
+    background: #0a0a0a;
+    min-height: 100vh;
+}
+
+/* Fallback cuối cùng cho background */
+body {
+    background: radial-gradient(circle at 25% 25%, rgba(0, 150, 255, 0.3) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(255, 0, 150, 0.3) 0%, transparent 50%), radial-gradient(circle at 50% 50%, rgba(0, 255, 200, 0.2) 0%, transparent 50%), linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #480101 100%) !important;
+    background-attachment: fixed !important;
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+}
+
+@media (max-width: 320px) {
+    body::before {
+        background-size: 80px 40px;
+        animation: sparkle 35s linear infinite;
+        opacity: 0.2;
+    }
+    
+    body::after {
+        animation: scan 15s ease-in-out infinite;
+    }
+}
+
+/* Hiệu ứng highlight cho phần nhập họ tên */
+.highlight-section {
+    animation: highlightPulse 2s ease-in-out;
+    border-radius: 10px;
+    padding: 5px;
+}
+
+.highlight-input {
+    animation: inputGlow 2s ease-in-out;
+    box-shadow: 0 0 20px rgba(0, 191, 255, 0.6);
+}
+
+@keyframes highlightPulse {
+    0%, 100% { 
+        background: rgba(0, 191, 255, 0.1);
+        transform: scale(1);
+    }
+    50% { 
+        background: rgba(0, 191, 255, 0.3);
+        transform: scale(1.02);
+    }
+}
+
+@keyframes inputGlow {
+    0%, 100% { 
+        box-shadow: 0 0 20px rgba(0, 191, 255, 0.6);
+        border-color: #00BFFF;
+    }
+    50% { 
+        box-shadow: 0 0 30px rgba(0, 191, 255, 0.8);
+        border-color: #00BFFF;
+    }
+}
+
+/* Tooltip hướng dẫn kéo chỉnh ảnh */
+.drag-instruction-tooltip {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    animation: tooltipSlideIn 0.5s ease-out;
+    max-width: 280px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.tooltip-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.tooltip-icon {
+    font-size: 24px;
+    animation: bounce 2s infinite;
+}
+
+.tooltip-text {
+    flex: 1;
+}
+
+.tooltip-text strong {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 14px;
+}
+
+.tooltip-text small {
+    font-size: 12px;
+    opacity: 0.9;
+    line-height: 1.3;
+}
+
+@keyframes tooltipSlideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-5px);
+    }
+    60% {
+        transform: translateY(-3px);
+    }
+}
+
+/* Cải thiện trải nghiệm kéo ảnh */
+#cropCanvas {
+    cursor: grab;
+    transition: cursor 0.2s ease;
+}
+
+#cropCanvas:hover {
+    cursor: grab;
+}
+
+#cropCanvas.dragging {
+    cursor: grabbing !important;
+}
+
+/* Hiệu ứng khi đang kéo */
+#cropCanvas.dragging::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 191, 255, 0.1);
+    border-radius: 50%;
+    pointer-events: none;
+    animation: dragPulse 0.5s ease-in-out;
+}
+
+@keyframes dragPulse {
+    0%, 100% { opacity: 0; }
+    50% { opacity: 1; }
 }
 
 #container {
@@ -156,7 +489,7 @@ body::after {
 
 /* Dropdown tuỳ chỉnh (loại vé) */
 .hidden-select {
-    margin-left: ;
+    margin-left: 0;
     width: 10px;
     position: absolute;
     opacity: 0;
@@ -305,7 +638,7 @@ body::after {
 }
 
 .form-input:invalid {
-    border: 1px solid #8e47f7
+    border: 1px solid #8e47f7;
     animation: shake 0.5s ease-in-out;
 }
 
@@ -1140,21 +1473,38 @@ body::after {
     position: relative;
     display: inline-block;
     margin-bottom: 30px;
+    z-index: 2;
+}
+
+/* Ẩn hiệu ứng sao và gợn sóng trong canvas-container */
+.canvas-container .star-effect,
+.canvas-container .wave-effect {
+    display: none !important;
+}
+
+/* Tạo mask để ẩn hiệu ứng trong canvas-container */
+.canvas-container::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #480101 100%);
+    z-index: 1;
+    pointer-events: none;
 }
 
 .canvas-container::before {
     content: '';
     position: absolute;
-    right: -10px;
-    bottom: -10px;
-    background: 
-        radial-gradient(circle at 30% 70%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
-        radial-gradient(circle at 70% 30%, rgba(255, 119, 198, 0.2) 0%, transparent 50%),
-        rgba(59, 130, 246, 0.1);
-    border-radius: 20px;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #480101 100%);
     z-index: -1;
-    opacity: 0.8;
-    animation: pulse 4s ease-in-out infinite;
+    pointer-events: none;
 }
 
 @keyframes pulse {
@@ -1170,6 +1520,8 @@ body::after {
     height: auto;
     aspect-ratio: 1 / 1;
     display: block;
+    position: relative;
+    z-index: 3;
 }
 
 /* đã xoá block canvas-controls inline theo yêu cầu */
@@ -1238,16 +1590,190 @@ body::after {
     display: none;
 }
 
-/* Điều chỉnh responsive cho canvas */
-@media (max-width: 1024px) {
+/* Responsive cho mobile */
+@media (max-width: 768px) {
+    .star-effect {
+        background-size: 400px 300px !important;
+        animation: sparkle 20s linear infinite !important;
+        opacity: 0.4 !important;
+    }
+    
+    .wave-effect {
+        width: 40% !important;
+        background-size: 80% !important;
+        animation: waveRipple3D 15s ease-in-out infinite !important;
+    }
+    
+    #container {
+        flex-direction: column !important;
+        padding: 10px !important;
+    }
+    
+    .left-panel, .right-panel {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+    
+    .left-panel {
+        order: 2 !important;
+        margin-bottom: 20px !important;
+    }
+    
+    .right-panel {
+        order: 1 !important;
+        margin-bottom: 20px !important;
+    }
+    
     .canvas-container {
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
         text-align: center;
     }
     
     #invitationCanvas {
-        max-width: 100%;
-        height: auto;
+        width: 100% !important;
+        max-width: 350px !important;
+        height: auto !important;
         aspect-ratio: 1/1;
+    }
+    
+    .form-container {
+        padding: 15px !important;
+    }
+    
+    .form-group {
+        margin-bottom: 15px !important;
+    }
+    
+    .form-input {
+        font-size: 16px !important;
+        padding: 12px !important;
+    }
+    
+    .generate-btn, .download-btn, .instructions-btn {
+        width: 100% !important;
+        padding: 15px !important;
+        font-size: 16px !important;
+        margin-bottom: 10px !important;
+    }
+    
+    .modal-content {
+        width: 95% !important;
+        max-width: 400px !important;
+        margin: 20px auto !important;
+        padding: 20px !important;
+    }
+    
+    .welcome-modal-content {
+        max-height: 90vh !important;
+        overflow-y: auto !important;
+    }
+    
+    .welcome-content {
+        flex-direction: column !important;
+    }
+    
+    .frame-preview {
+        width: 100% !important;
+        margin-bottom: 20px !important;
+    }
+    
+    .frame-image {
+        width: 100% !important;
+        height: auto !important;
+    }
+    
+    .instruction-steps {
+        width: 100% !important;
+    }
+    
+    .step {
+        margin-bottom: 15px !important;
+        padding: 10px !important;
+    }
+    
+    .photo-modal {
+        width: 95% !important;
+        max-width: 350px !important;
+    }
+    
+    #cropCanvas {
+        width: 100% !important;
+        max-width: 250px !important;
+        height: auto !important;
+    }
+    
+    .crop-controls {
+        padding: 10px !important;
+    }
+    
+    .crop-buttons {
+        flex-direction: column !important;
+        gap: 10px !important;
+    }
+    
+    .crop-buttons button {
+        width: 100% !important;
+        padding: 12px !important;
+    }
+    
+    .control-group {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+    
+    .control-group label {
+        text-align: center;
+        min-width: auto;
+    }
+    
+    .control-group span {
+        text-align: center;
+        min-width: auto;
+    }
+}
+
+/* Responsive cho tablet */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .star-effect {
+        background-size: 500px 350px !important;
+        animation: sparkle 25s linear infinite !important;
+        opacity: 0.5 !important;
+    }
+    
+    .wave-effect {
+        width: 45% !important;
+        animation: waveRipple3D 16s ease-in-out infinite !important;
+    }
+    
+    #container {
+        padding: 15px !important;
+    }
+    
+    .left-panel, .right-panel {
+        width: 48% !important;
+    }
+    
+    #invitationCanvas {
+        width: 100% !important;
+        max-width: 500px !important;
+        height: auto !important;
+        aspect-ratio: 1/1;
+    }
+    
+    .form-container {
+        padding: 20px !important;
+    }
+    
+    .modal-content {
+        width: 90% !important;
+        max-width: 600px !important;
+    }
+    
+    .canvas-container {
+        text-align: center;
     }
     
     .control-group {

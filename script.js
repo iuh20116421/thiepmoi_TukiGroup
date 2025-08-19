@@ -241,6 +241,9 @@ class InvitationGenerator {
             };
         }
         
+        // Thêm sự kiện click cho các step trong welcomeModal để điều hướng
+        this.setupStepNavigation();
+        
         // Hiển thị modal chào mừng khi vào trang
         this.showWelcomeModalOnce();
     }
@@ -297,6 +300,96 @@ class InvitationGenerator {
         }
     }
     
+    setupStepNavigation() {
+        // Thêm sự kiện click cho tất cả các step trong welcomeModal
+        const steps = document.querySelectorAll('.instruction-steps .step');
+        steps.forEach(step => {
+            step.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Đóng modal chào mừng
+                const welcomeModal = document.getElementById('welcomeModal');
+                if (welcomeModal) {
+                    welcomeModal.style.display = 'none';
+                }
+                
+                // Điều hướng đến phần nhập họ tên
+                this.navigateToGuestNameSection();
+            });
+            
+            // Thêm style cursor pointer để người dùng biết có thể click
+            step.style.cursor = 'pointer';
+        });
+    }
+    
+    navigateToGuestNameSection() {
+        // Tìm phần tử nhập họ tên
+        const guestNameSection = document.getElementById('guestNameSection');
+        const guestNameInput = document.getElementById('guestName');
+        
+        if (guestNameSection && guestNameInput) {
+            // Scroll đến phần nhập họ tên với hiệu ứng mượt mà
+            guestNameSection.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'center' 
+            });
+            
+            // Focus vào input nhập tên
+            setTimeout(() => {
+                guestNameInput.focus();
+                
+                // Thêm hiệu ứng highlight để thu hút sự chú ý
+                this.highlightGuestNameSection();
+            }, 500);
+        }
+    }
+    
+    highlightGuestNameSection() {
+        const guestNameSection = document.getElementById('guestNameSection');
+        const guestNameInput = document.getElementById('guestName');
+        
+        if (guestNameSection && guestNameInput) {
+            // Thêm class highlight tạm thời
+            guestNameSection.classList.add('highlight-section');
+            guestNameInput.classList.add('highlight-input');
+            
+            // Xóa highlight sau 3 giây
+            setTimeout(() => {
+                guestNameSection.classList.remove('highlight-section');
+                guestNameInput.classList.remove('highlight-input');
+            }, 3000);
+        }
+    }
+    
+    showDragInstructions() {
+        // Tạo tooltip hướng dẫn kéo chỉnh
+        const tooltip = document.createElement('div');
+        tooltip.className = 'drag-instruction-tooltip';
+        tooltip.innerHTML = `
+            <div class="tooltip-content">
+                <div class="tooltip-icon">👆</div>
+                <div class="tooltip-text">
+                    <strong>Kéo ảnh để điều chỉnh vị trí</strong><br>
+                    <small>Kéo lên/xuống/trái/phải để hiển thị phần mong muốn</small>
+                </div>
+            </div>
+        `;
+        
+        // Thêm vào modal
+        const photoModal = document.getElementById('photoModal');
+        if (photoModal) {
+            photoModal.appendChild(tooltip);
+            
+            // Tự động ẩn sau 5 giây
+            setTimeout(() => {
+                if (tooltip.parentNode) {
+                    tooltip.parentNode.removeChild(tooltip);
+                }
+            }, 9000);
+        }
+    }
+    
     loadBackgroundImage() {
         this.backgroundImage = new Image();
         this.backgroundImage.onload = () => {
@@ -329,12 +422,16 @@ class InvitationGenerator {
                 this.photoImage = new Image();
                 this.photoImage.onload = () => {
                     this.userPhoto = e.target.result;
-                    this.resetPhotoPosition();
+                    // Sử dụng tối ưu vị trí thay vì reset
+                    this.optimizePhotoPosition();
                     this.photoPreview.style.display = 'block';
                     this.updateCropPreview();
                     // Ensure modal stays open after selecting a file
                     if (this.photoModal) this.photoModal.style.display = 'block';
                     this.isFileDialogOpen = false;
+                    
+                    // Hiển thị hướng dẫn kéo chỉnh
+                    this.showDragInstructions();
                 };
                 this.photoImage.src = e.target.result;
             };
@@ -414,7 +511,7 @@ class InvitationGenerator {
         cropCtx.arc(centerX, centerY, radius, 0, Math.PI * 2);
         cropCtx.clip();
         
-        // Tính toán tỉ lệ và vị trí ảnh
+        // Tính toán tỉ lệ và vị trí ảnh với ưu tiên hiển thị phần đầu
         const imgAspect = this.photoImage.width / this.photoImage.height;
         let drawWidth, drawHeight;
         
@@ -431,17 +528,32 @@ class InvitationGenerator {
             drawHeight = drawWidth / imgAspect;
         }
         
-        // Độ lệch tối đa để ảnh không vượt khỏi hình tròn
+        // Độ lệch tối đa để ảnh không vượt khỏi hình tròn (cho phép linh hoạt hơn)
         const maxOffsetX = Math.max(0, (drawWidth - baseSize) / 2);
         const maxOffsetY = Math.max(0, (drawHeight - baseSize) / 2);
         
-        // Khoá vị trí để ảnh luôn trong hình tròn
-        const clampedPositionX = Math.max(-maxOffsetX, Math.min(maxOffsetX, this.photoPositionX));
-        const clampedPositionY = Math.max(-maxOffsetY, Math.min(maxOffsetY, this.photoPositionY));
+        // Cho phép kéo tự do hơn, chỉ giới hạn khi ảnh quá nhỏ so với khung
+        let clampedPositionX = this.photoPositionX;
+        let clampedPositionY = this.photoPositionY;
         
-        // Căn giữa ảnh và áp dụng độ lệch
-        const drawX = Math.round((this.cropCanvas.width - drawWidth) / 2 + clampedPositionX);
-        const drawY = Math.round((this.cropCanvas.height - drawHeight) / 2 + clampedPositionY);
+        // Chỉ giới hạn khi ảnh lớn hơn khung
+        if (drawWidth > baseSize) {
+            clampedPositionX = Math.max(-maxOffsetX, Math.min(maxOffsetX, this.photoPositionX));
+        }
+        if (drawHeight > baseSize) {
+            clampedPositionY = Math.max(-maxOffsetY, Math.min(maxOffsetY, this.photoPositionY));
+        }
+        
+        // Căn giữa ảnh và áp dụng độ lệch với ưu tiên hiển thị phần đầu
+        let drawX = Math.round((this.cropCanvas.width - drawWidth) / 2 + clampedPositionX);
+        let drawY = Math.round((this.cropCanvas.height - drawHeight) / 2 + clampedPositionY);
+        
+        // Điều chỉnh vị trí để ưu tiên hiển thị phần đầu (nếu chưa có vị trí tùy chỉnh)
+        if (this.photoPositionX === 0 && this.photoPositionY === 0) {
+            // Dịch ảnh lên trên để hiển thị phần đầu tốt hơn
+            const headOffset = Math.min(30, drawHeight * 0.15); // 15% chiều cao ảnh hoặc tối đa 30px
+            drawY -= headOffset;
+        }
         
         // Vẽ ảnh
         cropCtx.drawImage(this.photoImage, drawX, drawY, drawWidth, drawHeight);
@@ -513,7 +625,7 @@ class InvitationGenerator {
         finalCtx.arc(centerX, centerY, radius, 0, Math.PI * 2);
         finalCtx.clip();
         
-        // Calculate image scaling and positioning
+        // Calculate image scaling and positioning with head priority
         const imgAspect = this.photoImage.width / this.photoImage.height;
         let drawWidth, drawHeight;
         
@@ -538,9 +650,15 @@ class InvitationGenerator {
         const clampedPositionX = Math.max(-maxOffsetX, Math.min(maxOffsetX, this.photoPositionX * 0.5));
         const clampedPositionY = Math.max(-maxOffsetY, Math.min(maxOffsetY, this.photoPositionY * 0.5));
         
-        // Center the image and apply position offsets
-        const drawX = (150 - drawWidth) / 2 + clampedPositionX;
-        const drawY = (150 - drawHeight) / 2 + clampedPositionY;
+        // Center the image and apply position offsets with head priority
+        let drawX = (150 - drawWidth) / 2 + clampedPositionX;
+        let drawY = (150 - drawHeight) / 2 + clampedPositionY;
+        
+        // Apply head priority adjustment for final saved image
+        if (this.photoPositionX === 0 && this.photoPositionY === 0) {
+            const headOffset = Math.min(20, drawHeight * 0.12); // 12% chiều cao ảnh hoặc tối đa 20px
+            drawY -= headOffset;
+        }
         
         // Draw the image
         finalCtx.drawImage(this.photoImage, drawX, drawY, drawWidth, drawHeight);
@@ -566,17 +684,54 @@ class InvitationGenerator {
         this.updateCropPreview();
     }
     
+    // Tối ưu vị trí ảnh để hiển thị khuôn mặt tốt hơn
+    optimizePhotoPosition() {
+        if (!this.photoImage) return;
+        
+        // Thuật toán ưu tiên hiển thị phần đầu/khuôn mặt
+        const imgAspect = this.photoImage.width / this.photoImage.height;
+        
+        // Reset vị trí về 0 trước khi tối ưu
+        this.photoPositionX = 0;
+        this.photoPositionY = 0;
+        
+        if (imgAspect > 1) {
+            // Ảnh ngang - ưu tiên căn giữa theo chiều cao và dịch lên trên
+            this.photoPositionY = -20; // Dịch lên trên để hiển thị đầu
+        } else {
+            // Ảnh dọc - ưu tiên căn giữa theo chiều rộng và dịch lên trên
+            this.photoPositionY = -30; // Dịch lên trên nhiều hơn cho ảnh dọc
+        }
+        
+        // Điều chỉnh scale để đảm bảo ảnh vừa khít
+        if (imgAspect > 1.5) {
+            // Ảnh rất ngang - tăng scale
+            this.photoScale = 1.2;
+            if (this.scaleSlider) this.scaleSlider.value = 1.2;
+        } else if (imgAspect < 0.8) {
+            // Ảnh rất dọc - tăng scale
+            this.photoScale = 1.3;
+            if (this.scaleSlider) this.scaleSlider.value = 1.3;
+        }
+        
+        this.updateCropPreview();
+    }
+    
     setupCropCanvasEvents() {
         let isDragging = false;
         let lastMousePos = { x: 0, y: 0 };
         
         this.cropCanvas.addEventListener('mousedown', (e) => {
             isDragging = true;
+            this.cropCanvas.style.cursor = 'grabbing';
             const rect = this.cropCanvas.getBoundingClientRect();
             lastMousePos = {
                 x: e.clientX - rect.left,
                 y: e.clientY - rect.top
             };
+            
+            // Thêm class để hiển thị trạng thái đang kéo
+            this.cropCanvas.classList.add('dragging');
         });
         
         this.cropCanvas.addEventListener('mousemove', (e) => {
@@ -587,20 +742,28 @@ class InvitationGenerator {
                     y: e.clientY - rect.top
                 };
                 
+                // Cập nhật vị trí theo cả hai chiều
                 this.photoPositionX += mousePos.x - lastMousePos.x;
                 this.photoPositionY += mousePos.y - lastMousePos.y;
                 
                 lastMousePos = mousePos;
                 this.updateCropPreview();
+            } else if (!isDragging) {
+                // Hiển thị cursor grab khi hover
+                this.cropCanvas.style.cursor = 'grab';
             }
         });
         
         this.cropCanvas.addEventListener('mouseup', () => {
             isDragging = false;
+            this.cropCanvas.style.cursor = 'grab';
+            this.cropCanvas.classList.remove('dragging');
         });
         
         this.cropCanvas.addEventListener('mouseleave', () => {
             isDragging = false;
+            this.cropCanvas.style.cursor = 'default';
+            this.cropCanvas.classList.remove('dragging');
         });
 
         // Recompute preview center on resize to keep avatar centered
@@ -942,15 +1105,66 @@ class InvitationGenerator {
             this.drawFallbackDesign(downloadCtx);
         }
         
-        const link = document.createElement('a');
-        link.download = `Thiep-Moi-TukiGroup-2025-${guestName}-${ticketType}.png`;
-        link.href = downloadCanvas.toDataURL('image/png', 1.0);
+        const dataURL = downloadCanvas.toDataURL('image/png', 1.0);
         
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        // Kiểm tra xem có phải thiết bị di động không
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
         
-        this.showNotification('Thiệp mời đã được tải xuống thành công! Hẹn sớm gặp lại quý khách');
+        if (isMobile) {
+            // Sử dụng Web Share API để chia sẻ ảnh trực tiếp vào bộ sưu tập ảnh
+            this.downloadForMobile(dataURL, guestName, ticketType);
+        } else {
+            // Tải xuống bình thường cho desktop
+            const link = document.createElement('a');
+            link.download = `Thiep-Moi-TukiGroup-2025-${guestName}-${ticketType}.png`;
+            link.href = dataURL;
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            this.showNotification('Thiệp mời đã được tải xuống thành công! Hẹn sớm gặp lại quý khách');
+        }
+    }
+    
+    async downloadForMobile(dataURL, guestName, ticketType) {
+        try {
+            // Tạo blob từ data URL
+            const response = await fetch(dataURL);
+            const blob = await response.blob();
+            
+            // Tạo file object
+            const file = new File([blob], `Thiep-Moi-TukiGroup-2025-${guestName}-${ticketType}.png`, {
+                type: 'image/png'
+            });
+            
+            // Kiểm tra Web Share API
+            if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+                await navigator.share({
+                    title: 'Thiệp mời TukiGroup',
+                    text: `Thiệp mời của ${guestName} - ${ticketType}`,
+                    files: [file]
+                });
+                this.showNotification('Thiệp mời đã được chia sẻ! Bạn có thể lưu vào bộ sưu tập ảnh.');
+            } else {
+                // Fallback: Tạo link tải xuống
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `Thiep-Moi-TukiGroup-2025-${guestName}-${ticketType}.png`;
+                link.click();
+                URL.revokeObjectURL(url);
+                this.showNotification('Thiệp mời đã được tải xuống thành công! Hẹn sớm gặp lại quý khách');
+            }
+        } catch (error) {
+            console.error('Lỗi khi tải ảnh:', error);
+            // Fallback: Tải xuống bình thường
+            const link = document.createElement('a');
+            link.download = `Thiep-Moi-TukiGroup-2025-${guestName}-${ticketType}.png`;
+            link.href = dataURL;
+            link.click();
+            this.showNotification('Thiệp mời đã được tải xuống thành công! Hẹn sớm gặp lại quý khách');
+        }
     }
     
     // Hàm phụ trợ xử lý màu sắc
@@ -1035,6 +1249,88 @@ class InvitationGenerator {
 // Khởi tạo ứng dụng khi DOM sẵn sàng
 document.addEventListener('DOMContentLoaded', () => {
     new InvitationGenerator();
+    
+    // Đảm bảo hiệu ứng ngôi sao và sóng nước hiển thị
+    setTimeout(() => {
+        const starEffect = document.querySelector('.star-effect');
+        const waveEffect = document.querySelector('.wave-effect');
+        
+        if (starEffect) {
+            starEffect.style.display = 'block';
+            starEffect.style.visibility = 'visible';
+            starEffect.style.opacity = '0.8';
+            starEffect.style.zIndex = '1';
+            console.log('Hiệu ứng ngôi sao đã được kích hoạt!');
+        }
+        
+        if (waveEffect) {
+            waveEffect.style.display = 'block';
+            waveEffect.style.visibility = 'visible';
+            waveEffect.style.opacity = '1';
+            waveEffect.style.zIndex = '1';
+            console.log('Hiệu ứng sóng nước đã được kích hoạt!');
+        }
+        
+        // Thêm hiệu ứng ngôi sao và sóng nước nếu chưa có
+        if (!starEffect) {
+            const newStarEffect = document.createElement('div');
+            newStarEffect.className = 'star-effect';
+            newStarEffect.style.cssText = `
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                width: 100% !important;
+                height: 100% !important;
+                pointer-events: none !important;
+                z-index: 1 !important;
+                background: 
+                    radial-gradient(3px 3px at 25px 35px, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.1) 50%, transparent 100%),
+                    radial-gradient(2px 2px at 85px 125px, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.08) 60%, transparent 100%),
+                    radial-gradient(4px 4px at 145px 85px, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0.12) 40%, transparent 100%),
+                    radial-gradient(2.5px 2.5px at 205px 175px, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0.09) 55%, transparent 100%),
+                    radial-gradient(3.5px 3.5px at 265px 125px, rgba(255,255,255,0.32) 0%, rgba(255,255,255,0.11) 45%, transparent 100%),
+                    radial-gradient(2px 2px at 325px 215px, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.07) 65%, transparent 100%),
+                    radial-gradient(4.5px 4.5px at 385px 165px, rgba(255,255,255,0.38) 0%, rgba(255,255,255,0.13) 35%, transparent 100%),
+                    radial-gradient(2.8px 2.8px at 445px 255px, rgba(255,255,255,0.26) 0%, rgba(255,255,255,0.08) 58%, transparent 100%),
+                    radial-gradient(3.2px 3.2px at 505px 195px, rgba(255,255,255,0.29) 0%, rgba(255,255,255,0.10) 50%, transparent 100%),
+                    radial-gradient(2.3px 2.3px at 565px 285px, rgba(255,255,255,0.24) 0%, rgba(255,255,255,0.07) 62%, transparent 100%);
+                background-repeat: repeat !important;
+                background-size: 600px 400px !important;
+                animation: sparkle 30s linear infinite !important;
+                opacity: 0.6 !important;
+                filter: blur(0.3px) !important;
+                display: block !important;
+                visibility: visible !important;
+            `;
+            document.body.appendChild(newStarEffect);
+            console.log('Đã tạo hiệu ứng ngôi sao mới!');
+        }
+        
+        if (!waveEffect) {
+            const newWaveEffect = document.createElement('div');
+            newWaveEffect.className = 'wave-effect';
+            newWaveEffect.style.cssText = `
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                width: 50% !important;
+                height: 100% !important;
+                pointer-events: none !important;
+                z-index: 1 !important;
+                background: 
+                    radial-gradient(ellipse 300px 80px at 15% 20%, rgba(64, 156, 255, 0.15) 0%, rgba(64, 156, 255, 0.08) 30%, transparent 60%),
+                    radial-gradient(ellipse 250px 60px at 35% 40%, rgba(100, 181, 246, 0.12) 0%, rgba(100, 181, 246, 0.06) 40%, transparent 70%),
+                    radial-gradient(ellipse 200px 50px at 55% 60%, rgba(144, 202, 249, 0.10) 0%, rgba(144, 202, 249, 0.05) 35%, transparent 65%),
+                    radial-gradient(ellipse 180px 45px at 75% 80%, rgba(179, 229, 252, 0.08) 0%, rgba(179, 229, 252, 0.04) 45%, transparent 75%),
+                    radial-gradient(ellipse 220px 55px at 25% 85%, rgba(129, 212, 250, 0.09) 0%, rgba(129, 212, 250, 0.04) 50%, transparent 80%);
+                animation: gentleWave 12s ease-in-out infinite !important;
+                display: block !important;
+                visibility: visible !important;
+            `;
+            document.body.appendChild(newWaveEffect);
+            console.log('Đã tạo hiệu ứng sóng nước mới!');
+        }
+    }, 100);
 });
 
 // Thêm một số hiệu ứng tương tác
