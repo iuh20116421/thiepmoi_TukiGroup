@@ -1255,26 +1255,43 @@ document.addEventListener('DOMContentLoaded', () => {
         const starEffect = document.querySelector('.star-effect');
         const waveEffect = document.querySelector('.wave-effect');
         
+        // Kiểm tra nếu là mobile
+        const isMobile = window.innerWidth <= 768;
+        
         if (starEffect) {
             starEffect.style.display = 'block';
             starEffect.style.visibility = 'visible';
-            starEffect.style.opacity = '0.8';
+            if (isMobile) {
+                starEffect.style.opacity = '0.2';
+                starEffect.style.animationDuration = '40s';
+            } else {
+                starEffect.style.opacity = '0.8';
+                starEffect.style.animationDuration = '30s';
+            }
             starEffect.style.zIndex = '1';
             console.log('Hiệu ứng ngôi sao đã được kích hoạt!');
         }
         
         if (waveEffect) {
-            waveEffect.style.display = 'block';
-            waveEffect.style.visibility = 'visible';
-            waveEffect.style.opacity = '1';
-            waveEffect.style.zIndex = '1';
-            console.log('Hiệu ứng sóng nước đã được kích hoạt!');
+            if (isMobile) {
+                waveEffect.style.display = 'none';
+                waveEffect.style.visibility = 'hidden';
+                console.log('Hiệu ứng sóng nước đã bị ẩn trên mobile!');
+            } else {
+                waveEffect.style.display = 'block';
+                waveEffect.style.visibility = 'visible';
+                waveEffect.style.opacity = '1';
+                waveEffect.style.zIndex = '1';
+                console.log('Hiệu ứng sóng nước đã được kích hoạt!');
+            }
         }
         
         // Thêm hiệu ứng ngôi sao và sóng nước nếu chưa có
         if (!starEffect) {
             const newStarEffect = document.createElement('div');
             newStarEffect.className = 'star-effect';
+            const starOpacity = isMobile ? '0.2' : '0.6';
+            const starAnimation = isMobile ? '40s' : '30s';
             newStarEffect.style.cssText = `
                 position: fixed !important;
                 top: 0 !important;
@@ -1296,8 +1313,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     radial-gradient(2.3px 2.3px at 565px 285px, rgba(255,255,255,0.24) 0%, rgba(255,255,255,0.07) 62%, transparent 100%);
                 background-repeat: repeat !important;
                 background-size: 600px 400px !important;
-                animation: sparkle 30s linear infinite !important;
-                opacity: 0.6 !important;
+                animation: sparkle ${starAnimation} linear infinite !important;
+                opacity: ${starOpacity} !important;
                 filter: blur(0.3px) !important;
                 display: block !important;
                 visibility: visible !important;
@@ -1306,7 +1323,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('Đã tạo hiệu ứng ngôi sao mới!');
         }
         
-        if (!waveEffect) {
+        if (!waveEffect && !isMobile) {
             const newWaveEffect = document.createElement('div');
             newWaveEffect.className = 'wave-effect';
             newWaveEffect.style.cssText = `
