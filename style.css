@@ -1399,19 +1399,22 @@ body {
     }
     
     .left-panel {
+        order: 1;
         padding: 30px;
     }
     
     .right-panel {
+        order: 2;
         padding: 30px;
     }
     
     #invitationCanvas {
-        width: 100%;
-        max-width: 650px;
-        height: auto;
-        aspect-ratio: 1/1;
-    }
+    width: 100%;
+    max-width: 650px;
+    height: auto;
+    aspect-ratio: 1/1;
+    border-radius: 15px !important;
+}
 }
 
 @media (max-width: 768px) {
@@ -1420,10 +1423,12 @@ body {
     }
     
     .left-panel {
+        order: 1;
         padding: 20px;
     }
     
     .right-panel {
+        order: 2;
         padding: 20px;
     }
     
@@ -1474,6 +1479,15 @@ body {
     display: inline-block;
     margin-bottom: 30px;
     z-index: 2;
+    border-radius: 10px !important;
+    overflow: hidden !important;
+}
+
+/* Đảm bảo canvas có border-radius */
+#invitationCanvas {
+    border-radius: 15px !important;
+    -webkit-border-radius: 10px !important;
+    -moz-border-radius: 10px !important;
 }
 
 /* Ẩn hiệu ứng sao và gợn sóng trong canvas-container */
@@ -1615,12 +1629,12 @@ body {
     }
     
     .left-panel {
-        order: 2 !important;
+        order: 1 !important;
         margin-bottom: 20px !important;
     }
     
     .right-panel {
-        order: 1 !important;
+        order: 2 !important;
         margin-bottom: 20px !important;
     }
     
@@ -1629,6 +1643,8 @@ body {
         justify-content: center !important;
         align-items: center !important;
         text-align: center;
+        border-radius: 10px !important;
+        overflow: hidden !important;
     }
     
     #invitationCanvas {
@@ -1636,6 +1652,7 @@ body {
         max-width: 350px !important;
         height: auto !important;
         aspect-ratio: 1/1;
+        border-radius: 10px !important;
     }
     
     .form-container {
@@ -1756,11 +1773,20 @@ body {
         width: 48% !important;
     }
     
+    .left-panel {
+        order: 1;
+    }
+    
+    .right-panel {
+        order: 2;
+    }
+    
     #invitationCanvas {
         width: 100% !important;
         max-width: 500px !important;
         height: auto !important;
         aspect-ratio: 1/1;
+        border-radius: 10px !important;
     }
     
     .form-container {
@@ -1774,6 +1800,8 @@ body {
     
     .canvas-container {
         text-align: center;
+        border-radius: 10px !important;
+        overflow: hidden !important;
     }
     
     .control-group {
