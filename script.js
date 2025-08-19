@@ -11,17 +11,11 @@ class InvitationGenerator {
         
         // Phần tử trong modal ảnh
         this.photoModal = document.getElementById('photoModal');
-        this.uploadPhotoBtn = document.getElementById('uploadPhotoBtn');
         this.cropCanvas = document.getElementById('cropCanvas');
         this.photoPreview = document.getElementById('photoPreview');
         this.cancelCrop = document.getElementById('cancelCrop');
         this.saveCrop = document.getElementById('saveCrop');
-        // this.resetCrop = document.getElementById('resetCrop'); // Đã bỏ nút đặt lại
         this.scaleSlider = document.getElementById('scaleSlider');
-        
-        // Điều khiển ảnh (đã bỏ phần inline)
-        this.photoControls = null;
-        this.editPhotoBtn = null;
         
         // Dữ liệu ảnh người dùng
         this.userPhoto = null;
@@ -132,15 +126,10 @@ class InvitationGenerator {
         });
         
         // Sự kiện trong modal ảnh
-        this.uploadPhotoBtn.addEventListener('click', () => {
-            // Ngăn nhấn ngoài đóng modal khi hộp thoại chọn file của hệ điều hành trả về
-            this.isFileDialogOpen = true;
-            this.photoInput.click();
-        });
-        
         this.photoInput.addEventListener('change', (e) => {
             this.handlePhotoUpload(e);
         });
+        
         // Một số trình duyệt trả focus về window dễ kích hoạt đóng modal.
         // Chặn nổi bọt trên các phần tử chính trong modal để tránh đóng ngoài ý muốn.
         [this.photoModal, this.photoPreview, this.cropCanvas].forEach(el => {
@@ -155,10 +144,6 @@ class InvitationGenerator {
         this.saveCrop.addEventListener('click', () => {
             this.saveCroppedPhoto();
         });
-        
-        // this.resetCrop.addEventListener('click', () => {
-        //     this.resetPhotoPosition();
-        // }); // Đã bỏ nút đặt lại
         
         // Thanh trượt phóng to/thu nhỏ trong modal
         if (this.scaleSlider) {
@@ -438,14 +423,18 @@ class InvitationGenerator {
     }
     
     openPhotoModal() {
-        this.photoModal.style.display = 'block';
-        // Đảm bảo canvas preview khớp kích thước CSS để nét
-        setTimeout(() => this.updateCropPreview(), 0);
+        // Tự động mở hộp thoại chọn file
+        const photoInput = document.getElementById('photoInput');
+        if (photoInput) {
+            photoInput.click();
+        } else {
+            this.showNotification('Lỗi: Không tìm thấy input file', 'error');
+        }
     }
     
     closePhotoModal() {
-        if (this.photoModal) this.photoModal.style.display = 'none';
-        if (this.photoPreview) this.photoPreview.style.display = 'none';
+        const photoModal = document.getElementById('photoModal');
+        if (photoModal) photoModal.style.display = 'none';
         this.isFileDialogOpen = false;
     }
     
@@ -459,10 +448,14 @@ class InvitationGenerator {
                     this.userPhoto = e.target.result;
                     // Sử dụng tối ưu vị trí thay vì reset
                     this.optimizePhotoPosition();
-                    this.photoPreview.style.display = 'block';
+                    
+                    // Hiển thị modal với preview
+                    const photoModal = document.getElementById('photoModal');
+                    if (photoModal) {
+                        photoModal.style.display = 'block';
+                    }
+                    
                     this.updateCropPreview();
-                    // Ensure modal stays open after selecting a file
-                    if (this.photoModal) this.photoModal.style.display = 'block';
                     this.isFileDialogOpen = false;
                     
                     // Hiển thị hướng dẫn kéo chỉnh
@@ -1049,7 +1042,7 @@ class InvitationGenerator {
         const circleX = rect.x + this.anchor.avatar.x * rect.width;
         const paddingBelowRespect = 54 * (rect.height / 650);
         let nameX = circleX;
-        let nameY = rect.y + this.anchor.inviteRespectBottomY * rect.height + paddingBelowRespect +17;
+        let nameY = rect.y + this.anchor.inviteRespectBottomY * rect.height + paddingBelowRespect +17 +32;
 
         // Đảm bảo tên nằm trên tiêu đề sự kiện ít nhất 6px
         const nameMaxY = rect.y + this.anchor.eventHeaderTopY * rect.height - 6;

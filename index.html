@@ -381,7 +381,7 @@
 					</div>
                 </div>
                 
-                <button id="generateInvitation" class="generate-btn">Chỉnh sửa ảnh</button>
+                <button id="generateInvitation" class="generate-btn">Tải ảnh lên</button>
             </div>
         </div>
         
@@ -394,7 +394,7 @@
             <button id="downloadInvitation" class="download-btn">Tải thiệp mời</button>
             
             <!-- Nút mở hướng dẫn -->
-            <button id="showInstructions" class="instructions-btn">Hướng dẫn tạo thiệp mời</button>
+            <button id="showInstructions" class="instructions-btn">Hướng dẫn tạo thiệp mời</button>s
             
             <div class="footer-info">
                 <p>Bản quyền thuộc về TukiGroup</p>
@@ -432,23 +432,22 @@
         </div>
     </div>
     
-    <!-- Cửa sổ tải ảnh lên + cắt ảnh -->
+    <!-- Cửa sổ chỉnh sửa ảnh -->
     <div id="photoModal" class="modal" style="display: none;">
         <div class="modal-content photo-modal">
             <span class="close">&times;</span>
             <h2>Chọn ảnh đại diện</h2>
             <div class="photo-upload-area">
                 <input type="file" id="photoInput" accept="image/*" style="display: none;">
-                <button id="uploadPhotoBtn" class="upload-btn">Tải ảnh lên</button>
-                <div id="photoPreview" class="photo-preview" style="display: none;">
+                <div id="photoPreview" class="photo-preview">
                     <canvas id="cropCanvas" width="300" height="300"></canvas>
                     <div class="crop-controls">
                         <p>Dùng thanh cuộn để thu phóng ảnh và kéo ảnh tới vị trí bạn muốn</p>
                         <input type="range" id="scaleSlider" min="0.5" max="3" step="0.1" value="1">
-                                                 <div class="crop-buttons">
-                             <button id="cancelCrop" class="cancel-btn">Hủy</button>
-                             <button id="saveCrop" class="save-btn">Lưu</button>
-                         </div>
+                        <div class="crop-buttons">
+                            <button id="cancelCrop" class="cancel-btn">Hủy</button>
+                            <button id="saveCrop" class="save-btn">Lưu</button>
+                        </div>
                     </div>
                 </div>
             </div>

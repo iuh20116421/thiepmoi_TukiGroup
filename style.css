@@ -507,6 +507,8 @@ body {
 .dropdown {
     position: relative;
     z-index: 999;
+    filter: none !important;
+    -webkit-filter: none !important;
 }
 
 .dropdown-toggle {
@@ -519,13 +521,15 @@ body {
     color: #333;
     text-align: left;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: none !important;
     border: 1px solid rgba(255, 255, 255, 0.2);
     position: relative;
-    backdrop-filter: blur(10px);
-    box-shadow: 
-        0 4px 15px rgba(0, 0, 0, 0.1),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    /* backdrop-filter: blur(10px); */
+    box-shadow: none !important;
+    filter: none !important;
+    -webkit-filter: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
 }
 
 .dropdown-label {
@@ -547,7 +551,7 @@ body {
     border-bottom: 2px solid #888;
     transform: translateY(-70%) rotate(45deg);
     pointer-events: none;
-    transition: transform 0.2s ease, border-color 0.2s ease;
+    transition: none !important;
 }
 
 .dropdown[aria-expanded="true"] .dropdown-toggle::after {
@@ -558,7 +562,7 @@ body {
 .dropdown-toggle:focus {
     outline: none;
     background: #fff;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.25);
+    box-shadow: none !important;
     border-color: #667eea;
 }
 
@@ -569,13 +573,13 @@ body {
     top: calc(100% + 8px);
     background: linear-gradient(180deg, #1e2a5f 0%, #0f1b47 100%);
     border-radius: 16px;
-    box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+    box-shadow: none !important;
     overflow: hidden;
     border: 1px solid rgba(255,255,255,0.08);
     display: none;
     z-index: 999;
     color: #e6edff;
-    backdrop-filter: blur(8px);
+    /* backdrop-filter: blur(8px); */
     transform-origin: top;
     transform: scale(1) translateY(0);
     opacity: 1;
@@ -612,7 +616,7 @@ body {
 .dropdown-toggle:hover {
     background: #ffffff;
     border-color: #7a8cff;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+    box-shadow: none !important;
 }
 
 @media (max-width: 768px) {
