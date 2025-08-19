@@ -16,7 +16,7 @@ class InvitationGenerator {
         this.photoPreview = document.getElementById('photoPreview');
         this.cancelCrop = document.getElementById('cancelCrop');
         this.saveCrop = document.getElementById('saveCrop');
-        this.resetCrop = document.getElementById('resetCrop');
+        // this.resetCrop = document.getElementById('resetCrop'); // Đã bỏ nút đặt lại
         this.scaleSlider = document.getElementById('scaleSlider');
         
         // Điều khiển ảnh (đã bỏ phần inline)
@@ -156,9 +156,9 @@ class InvitationGenerator {
             this.saveCroppedPhoto();
         });
         
-        this.resetCrop.addEventListener('click', () => {
-            this.resetPhotoPosition();
-        });
+        // this.resetCrop.addEventListener('click', () => {
+        //     this.resetPhotoPosition();
+        // }); // Đã bỏ nút đặt lại
         
         // Thanh trượt phóng to/thu nhỏ trong modal
         if (this.scaleSlider) {
@@ -706,18 +706,18 @@ class InvitationGenerator {
         this.generateInvitation();
     }
     
-    resetPhotoPosition() {
-        this.photoScale = 1;
-        this.photoPositionX = 0;
-        this.photoPositionY = 0;
-        
-        // Reset scale slider in modal
-        if (this.scaleSlider) {
-            this.scaleSlider.value = 1;
-        }
-        
-        this.updateCropPreview();
-    }
+    // resetPhotoPosition() {
+    //     this.photoScale = 1;
+    //     this.photoPositionX = 0;
+    //     this.photoPositionY = 0;
+    //     
+    //     // Reset scale slider in modal
+    //     if (this.scaleSlider) {
+    //         this.scaleSlider.value = 1;
+    //     }
+    //     
+    //     this.updateCropPreview();
+    // } // Đã bỏ method này vì không còn nút đặt lại
     
     // Tối ưu vị trí ảnh để hiển thị khuôn mặt tốt hơn
     optimizePhotoPosition() {

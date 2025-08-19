@@ -949,7 +949,7 @@ body {
 }
 
 .save-btn {
-    background: linear-gradient(45deg, #039623, #30f761);
+    background: linear-gradient(45deg, #8c0404, #4a30f7);
     color: white;
 }
 
@@ -1420,7 +1420,7 @@ body {
         max-width: 2500px;
         height: auto;
         aspect-ratio: 1/1;
-        border-radius: 15px !important;
+        border-radius: 20px !important;
     }
 }
 
@@ -1486,7 +1486,7 @@ body {
     display: inline-block;
     margin-bottom: 30px;
     z-index: 2;
-    border-radius: 10px !important;
+    border-radius: 15px !important;
     overflow: hidden !important;
     /* Tối ưu performance cho mobile */
     will-change: auto;
