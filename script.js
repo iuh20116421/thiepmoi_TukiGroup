@@ -1042,7 +1042,7 @@ class InvitationGenerator {
         const circleX = rect.x + this.anchor.avatar.x * rect.width;
         const paddingBelowRespect = 54 * (rect.height / 650);
         let nameX = circleX;
-        let nameY = rect.y + this.anchor.inviteRespectBottomY * rect.height + paddingBelowRespect +17;
+        let nameY = rect.y + this.anchor.inviteRespectBottomY * rect.height + paddingBelowRespect +17 + 25;
 
         // Đảm bảo tên nằm trên tiêu đề sự kiện ít nhất 6px
         const nameMaxY = rect.y + this.anchor.eventHeaderTopY * rect.height - 6;
