@@ -63,8 +63,8 @@ class InvitationGenerator {
         // Thiết lập High-DPI để ảnh vẽ sắc nét
         const devicePixelRatioValue = window.devicePixelRatio || 1;
 
-        // Kích thước vẽ logic - tăng lên 2500x2500 cho desktop, tối ưu cho mobile
-        const canvasSize = isMobile ? 800 : 2500;
+        // TỐI ƯU: Giảm kích thước canvas để cải thiện performance
+        const canvasSize = isMobile ? 800 : 1200; // Giảm từ 2500 xuống 1200
         this.canvas.width = canvasSize * devicePixelRatioValue;
         this.canvas.height = canvasSize * devicePixelRatioValue;
 
@@ -158,9 +158,13 @@ class InvitationGenerator {
         
         // Đã bỏ nút chỉnh sửa inline; chỉ mở modal bằng nút chính
         
-        // Tự vẽ lại khi thay đổi thông tin đầu vào
+        // TỐI ƯU: Thêm debounce để tránh vẽ lại canvas liên tục
+        let debounceTimer;
         this.guestNameInput.addEventListener('input', () => {
-            this.generateInvitation();
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                this.generateInvitation();
+            }, 300); // Delay 300ms trước khi vẽ lại
         });
         
 
@@ -458,6 +462,9 @@ class InvitationGenerator {
         const centerY = this.cropCanvas.height/2;
         const radius = this.cropCanvas.width/2 - 10;
         
+        // Lưu kích thước preview để đồng bộ với thiệp mời
+        this.previewRadius = radius;
+        
         // Vẽ viền phát sáng xanh ở preview
         cropCtx.save();
         
@@ -512,8 +519,8 @@ class InvitationGenerator {
         const imgAspect = this.photoImage.width / this.photoImage.height;
         let drawWidth, drawHeight;
         
-        // Kích thước cơ sở vừa khít hình tròn
-        const baseSize = this.cropCanvas.width - 20;
+        // Kích thước cơ sở vừa khít hình tròn - sử dụng radius thay vì width-20
+        const baseSize = radius * 2;
         
         if (imgAspect > 1) {
             // Ảnh ngang: khớp theo chiều cao
@@ -542,8 +549,8 @@ class InvitationGenerator {
         }
         
         // Căn giữa ảnh và áp dụng độ lệch với ưu tiên hiển thị phần đầu
-        let drawX = Math.round((this.cropCanvas.width - drawWidth) / 2 + clampedPositionX);
-        let drawY = Math.round((this.cropCanvas.height - drawHeight) / 2 + clampedPositionY);
+        let drawX = Math.round(centerX - drawWidth / 2 + clampedPositionX);
+        let drawY = Math.round(centerY - drawHeight / 2 + clampedPositionY);
         
         // Điều chỉnh vị trí để ưu tiên hiển thị phần đầu (nếu chưa có vị trí tùy chỉnh)
         if (this.photoPositionX === 0 && this.photoPositionY === 0) {
@@ -559,6 +566,9 @@ class InvitationGenerator {
     
     saveCroppedPhoto() {
         if (!this.photoImage) return;
+        
+        // Đồng bộ vị trí trước khi lưu
+        this.syncPhotoPosition();
         
         // Create a new canvas for the final cropped image
         const finalCanvas = document.createElement('canvas');
@@ -626,8 +636,8 @@ class InvitationGenerator {
         const imgAspect = this.photoImage.width / this.photoImage.height;
         let drawWidth, drawHeight;
         
-        // Calculate base size to fit the circle
-        const baseSize = 150;
+        // Calculate base size to fit the circle - sử dụng radius thay vì 150
+        const baseSize = radius * 2;
         
         if (imgAspect > 1) {
             // Landscape image - fit by height
@@ -648,8 +658,8 @@ class InvitationGenerator {
         const clampedPositionY = Math.max(-maxOffsetY, Math.min(maxOffsetY, this.photoPositionY * 0.5));
         
         // Center the image and apply position offsets with head priority
-        let drawX = (150 - drawWidth) / 2 + clampedPositionX;
-        let drawY = (150 - drawHeight) / 2 + clampedPositionY;
+        let drawX = centerX - drawWidth / 2 + clampedPositionX;
+        let drawY = centerY - drawHeight / 2 + clampedPositionY;
         
         // Apply head priority adjustment for final saved image
         if (this.photoPositionX === 0 && this.photoPositionY === 0) {
@@ -712,6 +722,19 @@ class InvitationGenerator {
         }
         
         this.updateCropPreview();
+    }
+    
+    // Đồng bộ vị trí giữa preview và thiệp mời
+    syncPhotoPosition() {
+        if (!this.photoImage || !this.previewRadius) return;
+        
+        // Tính tỷ lệ scale giữa preview và thiệp mời
+        const previewScale = this.previewRadius / 75; // 75 là radius chuẩn của preview
+        const invitationScale = 1; // Scale chuẩn của thiệp mời
+        
+        // Điều chỉnh vị trí theo tỷ lệ
+        this.photoPositionX = this.photoPositionX * (invitationScale / previewScale);
+        this.photoPositionY = this.photoPositionY * (invitationScale / previewScale);
     }
     
     setupCropCanvasEvents() {
@@ -842,6 +865,17 @@ class InvitationGenerator {
     }
     
     generateInvitation() {
+        // TỐI ƯU: Sử dụng requestAnimationFrame để smooth rendering
+        if (this.animationFrame) {
+            cancelAnimationFrame(this.animationFrame);
+        }
+        
+        this.animationFrame = requestAnimationFrame(() => {
+            this.drawCanvas();
+        });
+    }
+    
+    drawCanvas() {
         // Kiểm tra nếu là mobile để tối ưu performance
         const isMobile = window.innerWidth <= 768;
         
@@ -876,21 +910,9 @@ class InvitationGenerator {
             this.designRect = { x: dx, y: dy, width: drawW, height: drawH };
 
             // Draw overlays relative to image rect with performance optimization
-            if (isMobile) {
-                // Batch drawing operations for mobile with large canvas
-                requestAnimationFrame(() => {
-                    this.drawUserPhotoOnFrame(this.ctx, this.designRect);
-                    this.drawGuestNameOnFrame(this.ctx, this.designRect);
-                    this.drawTicketTypeBadgeOnFrame(this.ctx, this.designRect);
-                });
-            } else {
-                // For large desktop canvas, use requestAnimationFrame for smooth rendering
-                requestAnimationFrame(() => {
-                    this.drawUserPhotoOnFrame(this.ctx, this.designRect);
-                    this.drawGuestNameOnFrame(this.ctx, this.designRect);
-                    this.drawTicketTypeBadgeOnFrame(this.ctx, this.designRect);
-                });
-            }
+            this.drawUserPhotoOnFrame(this.ctx, this.designRect);
+            this.drawGuestNameOnFrame(this.ctx, this.designRect);
+            this.drawTicketTypeBadgeOnFrame(this.ctx, this.designRect);
         } else {
             // Fallback design if background image not loaded
             this.drawFallbackDesign();
@@ -960,7 +982,7 @@ class InvitationGenerator {
             const imgAspect = this.photoImage.width / this.photoImage.height;
             let drawWidth, drawHeight;
             
-            // Calculate base size to fit the circle
+            // Calculate base size to fit the circle - đồng bộ với preview
             const baseSize = circleRadius * 2;
             
             if (imgAspect > 1) {
@@ -977,7 +999,7 @@ class InvitationGenerator {
             const maxOffsetX = Math.max(0, (drawWidth - baseSize) / 2);
             const maxOffsetY = Math.max(0, (drawHeight - baseSize) / 2);
             
-            // Clamp position to keep image within circle bounds
+            // Clamp position to keep image within circle bounds - sử dụng vị trí đã đồng bộ
             const clampedPositionX = Math.max(-maxOffsetX, Math.min(maxOffsetX, this.photoPositionX));
             const clampedPositionY = Math.max(-maxOffsetY, Math.min(maxOffsetY, this.photoPositionY));
             
@@ -1145,16 +1167,17 @@ class InvitationGenerator {
         const guestName = this.guestNameInput.value || 'guest';
         const ticketType = this.ticketTypeSelect.value;
         
-        // Canvas tạm để xuất ảnh chất lượng cao
+        // TỐI ƯU: Canvas tạm để xuất ảnh chất lượng cao với độ phân giải tối ưu
         const downloadCanvas = document.createElement('canvas');
         const downloadCtx = downloadCanvas.getContext('2d');
         
-        // Đặt độ phân giải cao (2x) để ảnh sắc nét hơn
-        downloadCanvas.width = this.displayWidth * 2;
-        downloadCanvas.height = this.displayHeight * 2;
+        // Đặt độ phân giải cao (3x) để ảnh sắc nét hơn khi download
+        const downloadScale = 3;
+        downloadCanvas.width = this.displayWidth * downloadScale;
+        downloadCanvas.height = this.displayHeight * downloadScale;
         
         // Scale context tương ứng bản gốc
-        downloadCtx.scale(2, 2);
+        downloadCtx.scale(downloadScale, downloadScale);
         
         // Bật làm mịn ảnh chất lượng cao
         downloadCtx.imageSmoothingEnabled = true;
@@ -1227,31 +1250,130 @@ class InvitationGenerator {
             
             // Kiểm tra Web Share API
             if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-                await navigator.share({
-                    title: 'Thiệp mời TukiGroup',
-                    text: `Thiệp mời của ${guestName} - ${ticketType}`,
-                    files: [file]
-                });
-                this.showNotification('Thiệp mời đã được chia sẻ! Bạn có thể lưu vào bộ sưu tập ảnh.');
-            } else {
-                // Fallback: Tạo link tải xuống
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = `Thiep-Moi-TukiGroup-2025-${guestName}-${ticketType}.png`;
-                link.click();
-                URL.revokeObjectURL(url);
-                this.showNotification('Thiệp mời đã được tải xuống thành công! Hẹn sớm gặp lại quý khách');
+                try {
+                    await navigator.share({
+                        title: 'Thiệp mời TukiGroup',
+                        text: `Thiệp mời của ${guestName} - ${ticketType}`,
+                        files: [file]
+                    });
+                    this.showNotification('Thiệp mời đã được chia sẻ! Bạn có thể lưu vào bộ sưu tập ảnh.');
+                    return;
+                } catch (shareError) {
+                    console.log('Web Share API bị hủy, hiển thị modal');
+                }
             }
+            
+            // Fallback: Hiển thị modal để hướng dẫn lưu ảnh
+            this.showImageForDirectSave(blob, guestName, ticketType);
+            
         } catch (error) {
             console.error('Lỗi khi tải ảnh:', error);
-            // Fallback: Tải xuống bình thường
-            const link = document.createElement('a');
-            link.download = `Thiep-Moi-TukiGroup-2025-${guestName}-${ticketType}.png`;
-            link.href = dataURL;
-            link.click();
-            this.showNotification('Thiệp mời đã được tải xuống thành công! Hẹn sớm gặp lại quý khách');
+            // Fallback: Hiển thị modal
+            this.showImageForDirectSave(blob, guestName, ticketType);
         }
+    }
+    
+
+    
+    // TỐI ƯU: Hiển thị ảnh để người dùng có thể lưu trực tiếp
+    showImageForDirectSave(blob, guestName, ticketType) {
+        // Tạo modal hiển thị ảnh
+        const modal = document.createElement('div');
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        `;
+        
+        // Tạo ảnh để hiển thị với chất lượng cao
+        const img = document.createElement('img');
+        img.src = URL.createObjectURL(blob);
+        img.style.cssText = `
+            max-width: 100%;
+            max-height: 65vh;
+            border-radius: 15px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+            border: 3px solid rgba(255, 255, 255, 0.1);
+        `;
+        
+        // Thêm thuộc tính để tối ưu lưu ảnh
+        img.setAttribute('download', `Thiep-Moi-TukiGroup-2025-${guestName}-${ticketType}.png`);
+        img.setAttribute('alt', `Thiệp mời ${guestName} - ${ticketType}`);
+        
+        // Tạo nút hướng dẫn chi tiết
+        const instructions = document.createElement('div');
+        instructions.style.cssText = `
+            color: white;
+            text-align: center;
+            margin-top: 25px;
+            font-family: 'Roboto', sans-serif;
+            font-size: 16px;
+            line-height: 1.6;
+            max-width: 400px;
+        `;
+        instructions.innerHTML = `
+            <h3 style="margin-bottom: 10px; color: #00BFFF; font-size: 20px;">💾 Lưu thiệp mời vào bộ sưu tập ảnh</h3>
+            <div style="background: rgba(255, 255, 255, 0.11); padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                <p style="margin-bottom: 8px; font-weight: 600;">📱 <strong>Cách 1:</strong> Nhấn giữ ảnh → "Thêm vào ảnh"</p>
+                <p style="margin-bottom: 8px; font-weight: 600;">📤 <strong>Cách 2:</strong> Nhấn giữ ảnh → "Chia sẻ" → "Lưu vào Ảnh"</p>
+            </div>
+            <p style="font-size: 14px; opacity: 0.8; margin-top: 10px;">Thiệp mời: <strong>${guestName}</strong> - <strong>${ticketType}</strong></p>
+        `;
+        
+
+        
+        // Tạo nút đóng
+        const closeBtn = document.createElement('button');
+        closeBtn.textContent = '✕ Đóng';
+        closeBtn.style.cssText = `
+            background: linear-gradient(45deg, #e91e63, #ff6b9d);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        `;
+        closeBtn.onclick = () => {
+            document.body.removeChild(modal);
+            URL.revokeObjectURL(img.src);
+        };
+        
+        // Thêm các phần tử vào modal
+        modal.appendChild(img);
+        modal.appendChild(instructions);
+        modal.appendChild(closeBtn);
+        
+        // Thêm vào body
+        document.body.appendChild(modal);
+        
+        // Tự động đóng sau 60 giây
+        setTimeout(() => {
+            if (document.body.contains(modal)) {
+                document.body.removeChild(modal);
+                URL.revokeObjectURL(img.src);
+            }
+        }, 60000);
+        
+        // Thêm sự kiện click để đóng modal
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                document.body.removeChild(modal);
+                URL.revokeObjectURL(img.src);
+            }
+        });
     }
     
     // Hàm phụ trợ xử lý màu sắc

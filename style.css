@@ -20,7 +20,7 @@ body {
     overflow-x: hidden;
 }
 
-/* Hiệu ứng ngôi sao chuyển động */
+/* TỐI ƯU: Hiệu ứng ngôi sao chuyển động - giảm độ phức tạp */
 body::before {
     content: '';
     position: fixed;
@@ -29,25 +29,20 @@ body::before {
     width: 100%;
     height: 100%;
     background: 
-        radial-gradient(3px 3px at 25px 35px, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.1) 50%, transparent 100%),
-        radial-gradient(2px 2px at 85px 125px, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.08) 60%, transparent 100%),
-        radial-gradient(4px 4px at 145px 85px, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0.12) 40%, transparent 100%),
-        radial-gradient(2.5px 2.5px at 205px 175px, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0.09) 55%, transparent 100%),
-        radial-gradient(3.5px 3.5px at 265px 125px, rgba(255,255,255,0.32) 0%, rgba(255,255,255,0.11) 45%, transparent 100%),
-        radial-gradient(2px 2px at 325px 215px, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.07) 65%, transparent 100%),
-        radial-gradient(4.5px 4.5px at 385px 165px, rgba(255,255,255,0.38) 0%, rgba(255,255,255,0.13) 35%, transparent 100%),
-        radial-gradient(2.8px 2.8px at 445px 255px, rgba(255,255,255,0.26) 0%, rgba(255,255,255,0.08) 58%, transparent 100%),
-        radial-gradient(3.2px 3.2px at 505px 195px, rgba(255,255,255,0.29) 0%, rgba(255,255,255,0.10) 50%, transparent 100%),
-        radial-gradient(2.3px 2.3px at 565px 285px, rgba(255,255,255,0.24) 0%, rgba(255,255,255,0.07) 62%, transparent 100%);
+        radial-gradient(3px 3px at 25px 35px, rgba(255,255,255,0.2) 0%, transparent 100%),
+        radial-gradient(2px 2px at 85px 125px, rgba(255,255,255,0.15) 0%, transparent 100%),
+        radial-gradient(4px 4px at 145px 85px, rgba(255,255,255,0.25) 0%, transparent 100%),
+        radial-gradient(2.5px 2.5px at 205px 175px, rgba(255,255,255,0.18) 0%, transparent 100%),
+        radial-gradient(3.5px 3.5px at 265px 125px, rgba(255,255,255,0.22) 0%, transparent 100%);
     background-repeat: repeat;
     background-size: 600px 400px;
-    animation: sparkle 30s linear infinite;
-    opacity: 0.6;
-    filter: blur(0.3px);
+    animation: sparkle 40s linear infinite; /* Tăng thời gian animation */
+    opacity: 0.4; /* Giảm opacity */
+    filter: blur(0.2px); /* Giảm blur */
     z-index: -1;
 }
 
-/* Hiệu ứng sóng nước chuyển động */
+/* TỐI ƯU: Hiệu ứng sóng nước chuyển động - giảm độ phức tạp */
 body::after {
     content: '';
     position: fixed;
@@ -56,12 +51,10 @@ body::after {
     width: 50%;
     height: 100%;
     background: 
-        radial-gradient(ellipse 300px 80px at 15% 20%, rgba(64, 156, 255, 0.15) 0%, rgba(64, 156, 255, 0.08) 30%, transparent 60%),
-        radial-gradient(ellipse 250px 60px at 35% 40%, rgba(100, 181, 246, 0.12) 0%, rgba(100, 181, 246, 0.06) 40%, transparent 70%),
-        radial-gradient(ellipse 200px 50px at 55% 60%, rgba(144, 202, 249, 0.10) 0%, rgba(144, 202, 249, 0.05) 35%, transparent 65%),
-        radial-gradient(ellipse 180px 45px at 75% 80%, rgba(179, 229, 252, 0.08) 0%, rgba(179, 229, 252, 0.04) 45%, transparent 75%),
-        radial-gradient(ellipse 220px 55px at 25% 85%, rgba(129, 212, 250, 0.09) 0%, rgba(129, 212, 250, 0.04) 50%, transparent 80%);
-    animation: gentleWave 12s ease-in-out infinite;
+        radial-gradient(ellipse 300px 80px at 15% 20%, rgba(64, 156, 255, 0.1) 0%, transparent 60%),
+        radial-gradient(ellipse 250px 60px at 35% 40%, rgba(100, 181, 246, 0.08) 0%, transparent 70%),
+        radial-gradient(ellipse 200px 50px at 55% 60%, rgba(144, 202, 249, 0.06) 0%, transparent 65%);
+    animation: gentleWave 16s ease-in-out infinite; /* Tăng thời gian animation */
     z-index: -1;
 }
 
@@ -208,15 +201,19 @@ body::after {
     visibility: visible !important;
 }
 
-/* Hiệu ứng mobile - đơn giản hóa */
+/* TỐI ƯU: Tắt hiệu ứng nặng trên mobile để cải thiện performance */
 @media (max-width: 768px) {
     body::before {
-        background-size: 150px 75px;
-        animation: sparkle 25s linear infinite;
+        display: none !important; /* Tắt hoàn toàn hiệu ứng sao trên mobile */
     }
     
     body::after {
-        animation: scan 10s ease-in-out infinite;
+        display: none !important; /* Tắt hoàn toàn hiệu ứng sóng trên mobile */
+    }
+    
+    /* Tắt các animation nặng khác */
+    .star-effect, .wave-effect {
+        display: none !important;
     }
 }
 
@@ -1417,7 +1414,7 @@ body {
     }
 }
 
-/* Kiểu dáng khung chứa canvas */
+/* TỐI ƯU: Kiểu dáng khung chứa canvas với performance tốt hơn */
 .canvas-container {
     position: relative;
     display: inline-block;
@@ -1425,10 +1422,14 @@ body {
     z-index: 2;
     border-radius: 15px !important;
     overflow: hidden !important;
-    /* Tối ưu performance cho mobile */
+    /* Tối ưu performance */
     will-change: auto;
     transform: translateZ(0);
     backface-visibility: hidden;
+    /* Thêm tối ưu cho mobile */
+    -webkit-transform: translateZ(0);
+    -moz-transform: translateZ(0);
+    -ms-transform: translateZ(0);
 }
 
 /* Đảm bảo canvas có border-radius */

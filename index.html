@@ -6,7 +6,9 @@
     <title>Thiệp mời TukiGroup</title>
     <link rel="icon" type="image/png" href="image/logoTrinhDuyet.png">
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:100,300,400,700,900&display=swap" rel="stylesheet">
+    <!-- TỐI ƯU: Preload font để cải thiện performance -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:100,300,400,700,900&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Roboto:100,300,400,700,900&display=swap" rel="stylesheet"></noscript>
     <style>
         /* Đảm bảo hiệu ứng ngôi sao và sóng nước hiển thị */
         .star-effect {
@@ -346,7 +348,8 @@
         <!-- Bên trái - Biểu mẫu -->
         <div class="left-panel">
             <div class="logo">
-                <img src="image/logos.png" alt="AI E-COMMERCE REVOLUTION">
+                <!-- TỐI ƯU: Thêm lazy loading cho logo -->
+                <img src="image/logos.png" alt="AI E-COMMERCE REVOLUTION" loading="lazy">
             </div>
             
             <div class="form-container">
@@ -411,7 +414,8 @@
             
             <div class="welcome-content">
                 <div class="frame-preview">
-                    <img src="image/frameEventChiBinh.jpg" alt="Thiệp mời mẫu" class="frame-image">
+                    <!-- TỐI ƯU: Thêm lazy loading cho ảnh mẫu -->
+                    <img src="image/frameEventChiBinh.jpg" alt="Thiệp mời mẫu" class="frame-image" loading="lazy">
                 </div>
                 
                 <div class="instruction-steps">
