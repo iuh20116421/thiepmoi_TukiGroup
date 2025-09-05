@@ -23,6 +23,7 @@ class InvitationGenerator {
         this.photoScale = 1;
         this.photoPositionX = 0;
         this.photoPositionY = 0;
+        this.positionSynced = false; // Flag để tránh đồng bộ nhiều lần
         
         // Neo vị trí (theo tỉ lệ trên khung 650x650) để các lớp vẽ bám theo ảnh khi letterbox
         this.anchor = {
@@ -149,6 +150,8 @@ class InvitationGenerator {
         if (this.scaleSlider) {
             this.scaleSlider.addEventListener('input', (e) => {
                 this.photoScale = parseFloat(e.target.value);
+                // Reset flag đồng bộ khi người dùng thay đổi scale
+                this.positionSynced = false;
                 this.updateCropPreview();
             });
         }
@@ -522,6 +525,9 @@ class InvitationGenerator {
         // Kích thước cơ sở vừa khít hình tròn - sử dụng radius thay vì width-20
         const baseSize = radius * 2;
         
+        // Debug log để kiểm tra
+        console.log('Preview - Image aspect:', imgAspect, 'BaseSize:', baseSize, 'Radius:', radius, 'Position:', { x: this.photoPositionX, y: this.photoPositionY });
+        
         if (imgAspect > 1) {
             // Ảnh ngang: khớp theo chiều cao
             drawHeight = baseSize * this.photoScale;
@@ -728,13 +734,32 @@ class InvitationGenerator {
     syncPhotoPosition() {
         if (!this.photoImage || !this.previewRadius) return;
         
-        // Tính tỷ lệ scale giữa preview và thiệp mời
-        const previewScale = this.previewRadius / 75; // 75 là radius chuẩn của preview
-        const invitationScale = 1; // Scale chuẩn của thiệp mời
+        // Lưu vị trí gốc từ preview
+        const originalX = this.photoPositionX;
+        const originalY = this.photoPositionY;
+        
+        // Tính tỷ lệ scale dựa trên kích thước thực tế của preview và thiệp mời
+        // Preview sử dụng radius động, thiệp mời sử dụng circleRadius được tính theo tỷ lệ
+        const previewRadius = this.previewRadius;
+        
+        // Tính invitationRadius thực tế dựa trên designRect hiện tại
+        const currentDesignRect = this.designRect || { width: 650, height: 650 };
+        const baseScale = currentDesignRect.width / 650;
+        const invitationRadius = Math.max(10, Math.round(this.anchor.avatar.r * 650 * baseScale));
+        
+        const scaleRatio = invitationRadius / previewRadius;
         
         // Điều chỉnh vị trí theo tỷ lệ
-        this.photoPositionX = this.photoPositionX * (invitationScale / previewScale);
-        this.photoPositionY = this.photoPositionY * (invitationScale / previewScale);
+        this.photoPositionX = originalX * scaleRatio;
+        this.photoPositionY = originalY * scaleRatio;
+        
+        console.log('Sync position:', {
+            original: { x: originalX, y: originalY },
+            previewRadius: previewRadius,
+            invitationRadius: invitationRadius,
+            scaleRatio: scaleRatio,
+            synced: { x: this.photoPositionX, y: this.photoPositionY }
+        });
     }
     
     setupCropCanvasEvents() {
@@ -769,6 +794,9 @@ class InvitationGenerator {
                 // Cập nhật vị trí theo cả hai chiều
                 this.photoPositionX += mousePos.x - lastMousePos.x;
                 this.photoPositionY += mousePos.y - lastMousePos.y;
+                
+                // Reset flag đồng bộ khi người dùng thay đổi vị trí
+                this.positionSynced = false;
                 
                 lastMousePos = mousePos;
                 this.updateCropPreview();
@@ -831,6 +859,9 @@ class InvitationGenerator {
                 // Cập nhật vị trí theo cả hai chiều
                 this.photoPositionX += touchPos.x - lastMousePos.x;
                 this.photoPositionY += touchPos.y - lastMousePos.y;
+                
+                // Reset flag đồng bộ khi người dùng thay đổi vị trí
+                this.positionSynced = false;
                 
                 lastMousePos = touchPos;
                 this.updateCropPreview();
@@ -926,6 +957,9 @@ class InvitationGenerator {
         const baseScale = rect.width / 650;
         const circleRadius = Math.max(10, Math.round(this.anchor.avatar.r * 650 * baseScale));
         
+        // Sử dụng vị trí trực tiếp từ preview thay vì đồng bộ
+        // Vì cách tính toán đã được chuẩn hóa, không cần đồng bộ nữa
+        
         if (this.userPhoto && this.photoImage) {
             // Draw glowing blue border effect for uploaded avatar
             ctx.save();
@@ -983,7 +1017,11 @@ class InvitationGenerator {
             let drawWidth, drawHeight;
             
             // Calculate base size to fit the circle - đồng bộ với preview
+            // Sử dụng cùng cách tính như trong preview để đảm bảo tính nhất quán
             const baseSize = circleRadius * 2;
+            
+            // Debug log để kiểm tra
+            console.log('Thiệp mời - Image aspect:', imgAspect, 'BaseSize:', baseSize, 'CircleRadius:', circleRadius, 'Position:', { x: this.photoPositionX, y: this.photoPositionY });
             
             if (imgAspect > 1) {
                 // Landscape image - fit by height
