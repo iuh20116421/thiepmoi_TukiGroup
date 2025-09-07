@@ -29,17 +29,16 @@ body::before {
     width: 100%;
     height: 100%;
     background: 
-        radial-gradient(3px 3px at 25px 35px, rgba(255,255,255,0.2) 0%, transparent 100%),
-        radial-gradient(2px 2px at 85px 125px, rgba(255,255,255,0.15) 0%, transparent 100%),
-        radial-gradient(4px 4px at 145px 85px, rgba(255,255,255,0.25) 0%, transparent 100%),
-        radial-gradient(2.5px 2.5px at 205px 175px, rgba(255,255,255,0.18) 0%, transparent 100%),
-        radial-gradient(3.5px 3.5px at 265px 125px, rgba(255,255,255,0.22) 0%, transparent 100%);
+        radial-gradient(2px 2px at 25px 35px, rgba(255,255,255,0.15) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 85px 125px, rgba(255,255,255,0.1) 0%, transparent 100%),
+        radial-gradient(2.5px 2.5px at 145px 85px, rgba(255,255,255,0.2) 0%, transparent 100%);
     background-repeat: repeat;
-    background-size: 600px 400px;
-    animation: sparkle 40s linear infinite; /* Tăng thời gian animation */
-    opacity: 0.4; /* Giảm opacity */
-    filter: blur(0.2px); /* Giảm blur */
+    background-size: 400px 300px; /* Giảm kích thước */
+    animation: sparkle 60s linear infinite; /* Tăng thời gian animation */
+    opacity: 0.3; /* Giảm opacity */
+    filter: blur(0.1px); /* Giảm blur */
     z-index: -1;
+    will-change: transform; /* Tối ưu GPU */
 }
 
 /* TỐI ƯU: Hiệu ứng sóng nước chuyển động - giảm độ phức tạp */
