@@ -43,7 +43,7 @@ class InvitationGenerator {
         
         // Màu theo hạng vé
         this.ticketColors = {
-            'Bronze': '#CD7F32',
+            'Basic': '#CD7F32',
             'Silver': '#E8E8E8',
             'Gold': '#FFD700',
             'Diamond': '#00BFFF'
