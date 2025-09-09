@@ -371,17 +371,19 @@
                     <label>Chọn hạng vé</label>
 					<!-- Hidden native select for accessibility and logic -->
 					<select id="ticketType" class="form-input select-input hidden-select" tabindex="-1" aria-hidden="true">
+						<option value="Bronze">BRONZE</option>
 						<option value="Silver">SILVER</option>
 						<option value="Gold">GOLD</option>
 						<option value="Diamond">DIAMOND</option>
 					</select>
 					<!-- Custom dropdown UI -->
 					<div class="dropdown" id="ticketDropdown">
-						<button type="button" class="dropdown-toggle" aria-haspopup="listbox" aria-expanded="false" title="SILVER">
-							<span class="dropdown-label">SILVER</span>
+						<button type="button" class="dropdown-toggle" aria-haspopup="listbox" aria-expanded="false" title="BRONZE">
+							<span class="dropdown-label">BRONZE</span>
 						</button>
 						<ul class="dropdown-menu" role="listbox">
-							<li class="dropdown-option" data-value="Silver" data-short="Silver" data-long="SILVER" role="option" aria-selected="true" title="VÉ">SILVER</li>
+							<li class="dropdown-option" data-value="Bronze" data-short="Bronze" data-long="BRONZE" role="option" aria-selected="true" title="VÉ">BRONZE</li>
+							<li class="dropdown-option" data-value="Silver" data-short="Silver" data-long="SILVER" role="option" title="SILVER">SILVER</li>
 							<li class="dropdown-option" data-value="Gold" data-short="Gold" data-long="GOLD" role="option" title="GOLD">GOLD</li>
 							<li class="dropdown-option" data-value="Diamond" data-short="Diamond" data-long="DIAMOND" role="option" title="DIAMOND">DIAMOND</li>
 						</ul>
