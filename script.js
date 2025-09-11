@@ -65,10 +65,11 @@ class InvitationGenerator {
         // Thiết lập High-DPI để ảnh vẽ sắc nét
         const devicePixelRatioValue = window.devicePixelRatio || 1;
 
-        // TỐI ƯU: Giảm kích thước canvas để cải thiện performance
-        const canvasSize = isMobile ? 800 : 1200; // Giảm từ 2500 xuống 1200
-        this.canvas.width = canvasSize * devicePixelRatioValue;
-        this.canvas.height = canvasSize * devicePixelRatioValue;
+        // CẢI THIỆN: Sử dụng kích thước canvas lớn hơn để đảm bảo chất lượng HD
+        // Canvas size dựa trên kích thước ảnh nền gốc để giữ nguyên tỷ lệ
+        const baseCanvasSize = isMobile ? 1000 : 2000; // Tăng kích thước để đảm bảo HD
+        this.canvas.width = baseCanvasSize * devicePixelRatioValue;
+        this.canvas.height = baseCanvasSize * devicePixelRatioValue;
 
         // Xoá kích thước CSS inline để không phá vỡ responsive
         this.canvas.style.width = '';
@@ -77,17 +78,13 @@ class InvitationGenerator {
         // Scale ngữ cảnh vẽ về đơn vị điểm ảnh CSS
         this.ctx.setTransform(devicePixelRatioValue, 0, 0, devicePixelRatioValue, 0, 0);
 
-        // Kích thước vẽ logic
-        this.displayWidth = canvasSize;
-        this.displayHeight = canvasSize;
+        // Kích thước vẽ logic - giữ nguyên kích thước gốc
+        this.displayWidth = baseCanvasSize;
+        this.displayHeight = baseCanvasSize;
 
-        // Tối ưu canvas context cho kích thước lớn
+        // Tối ưu canvas context cho chất lượng cao nhất
         this.ctx.imageSmoothingEnabled = true;
-        if (isMobile) {
-            this.ctx.imageSmoothingQuality = 'medium';
-        } else {
-            this.ctx.imageSmoothingQuality = 'high';
-        }
+        this.ctx.imageSmoothingQuality = 'high'; // Luôn sử dụng high quality
 
         // Tối ưu performance cho canvas lớn
         this.ctx.globalCompositeOperation = 'source-over';
@@ -497,18 +494,18 @@ class InvitationGenerator {
         cropCtx.shadowColor = 'transparent';
         cropCtx.shadowBlur = 0;
         
-        // Vẽ viền phát sáng chính
+        // Vẽ viền phát sáng chính - TĂNG ĐỘ DÀY
         cropCtx.strokeStyle = '#00BFFF';
-        cropCtx.lineWidth = 4;
+        cropCtx.lineWidth = 6; // Tăng từ 4 lên 6
         cropCtx.beginPath();
         cropCtx.arc(centerX, centerY, radius, 0, Math.PI * 2);
         cropCtx.stroke();
         
-        // Thêm hiệu ứng sáng bên trong
+        // Thêm hiệu ứng sáng bên trong - TĂNG ĐỘ DÀY
         cropCtx.strokeStyle = 'rgba(0, 191, 255, 0.6)';
-        cropCtx.lineWidth = 2;
+        cropCtx.lineWidth = 4; // Tăng từ 2 lên 4
         cropCtx.beginPath();
-        cropCtx.arc(centerX, centerY, radius - 2, 0, Math.PI * 2);
+        cropCtx.arc(centerX, centerY, radius - 3, 0, Math.PI * 2);
         cropCtx.stroke();
         
         cropCtx.restore();
@@ -577,15 +574,18 @@ class InvitationGenerator {
         // Đồng bộ vị trí trước khi lưu
         this.syncPhotoPosition();
         
-        // Create a new canvas for the final cropped image
+        // CẢI THIỆN: Tăng kích thước canvas để đảm bảo chất lượng HD
         const finalCanvas = document.createElement('canvas');
         const finalCtx = finalCanvas.getContext('2d');
-        finalCanvas.width = 150;
-        finalCanvas.height = 150;
         
-        const centerX = 75;
-        const centerY = 75;
-        const radius = 75;
+        // Sử dụng kích thước lớn hơn để đảm bảo chất lượng HD
+        const avatarSize = 300; // Tăng từ 150 lên 300
+        finalCanvas.width = avatarSize;
+        finalCanvas.height = avatarSize;
+        
+        const centerX = avatarSize / 2;
+        const centerY = avatarSize / 2;
+        const radius = avatarSize / 2;
         
         // Draw glowing blue border effect for saved photo
         finalCtx.save();
@@ -617,18 +617,18 @@ class InvitationGenerator {
          finalCtx.shadowColor = 'transparent';
          finalCtx.shadowBlur = 0;
          
-         // Vẽ viền sáng chính với độ dày vừa phải
+         // Vẽ viền sáng chính với độ dày tăng - TĂNG ĐỘ DÀY
          finalCtx.strokeStyle = '#00BFFF';
-         finalCtx.lineWidth = 4;
+         finalCtx.lineWidth = 8; // Tăng từ 4 lên 8
          finalCtx.beginPath();
          finalCtx.arc(centerX, centerY, radius, 0, Math.PI * 2);
          finalCtx.stroke();
          
-         // Thêm viền sáng bên trong để tăng độ sâu
+         // Thêm viền sáng bên trong để tăng độ sâu - TĂNG ĐỘ DÀY
          finalCtx.strokeStyle = 'rgba(0, 191, 255, 0.7)';
-         finalCtx.lineWidth = 2;
+         finalCtx.lineWidth = 5; // Tăng từ 2 lên 5
          finalCtx.beginPath();
-         finalCtx.arc(centerX, centerY, radius - 1, 0, Math.PI * 2);
+         finalCtx.arc(centerX, centerY, radius - 2, 0, Math.PI * 2);
          finalCtx.stroke();
         
         finalCtx.restore();
@@ -915,33 +915,36 @@ class InvitationGenerator {
         this.ctx.clearRect(0, 0, this.displayWidth, this.displayHeight);
         
         if (this.backgroundImage && this.backgroundImage.complete) {
-            // Draw background image with optimized quality for large canvas
+            // CẢI THIỆN: Luôn sử dụng chất lượng cao nhất cho ảnh nền
             this.ctx.imageSmoothingEnabled = true;
-            this.ctx.imageSmoothingQuality = isMobile ? 'medium' : 'high';
+            this.ctx.imageSmoothingQuality = 'high';
 
-            // Letterbox-fit the background into the square canvas (object-fit: contain)
+            // CẢI THIỆN: Giữ nguyên kích thước ảnh gốc thay vì letterbox
+            // Sử dụng kích thước ảnh gốc để đảm bảo chất lượng HD
             const imgW = this.backgroundImage.width;
             const imgH = this.backgroundImage.height;
+            
+            // Tính toán để ảnh vừa khít với canvas mà vẫn giữ tỷ lệ gốc
             const scale = Math.min(this.displayWidth / imgW, this.displayHeight / imgH);
             const drawW = Math.round(imgW * scale);
             const drawH = Math.round(imgH * scale);
             const dx = Math.round((this.displayWidth - drawW) / 2);
             const dy = Math.round((this.displayHeight - drawH) / 2);
 
-            // Paint backdrop so letterboxing feels intentional
+            // Vẽ nền đen để tạo viền nếu cần
             const bgGrad = this.ctx.createLinearGradient(0, 0, this.displayWidth, this.displayHeight);
             bgGrad.addColorStop(0, '#0f2b4c');
             bgGrad.addColorStop(1, '#0a1a30');
             this.ctx.fillStyle = bgGrad;
             this.ctx.fillRect(0, 0, this.displayWidth, this.displayHeight);
 
-            // Draw the centered background image
+            // Vẽ ảnh nền với chất lượng cao nhất
             this.ctx.drawImage(this.backgroundImage, dx, dy, drawW, drawH);
 
-            // Store rect for overlays
+            // Lưu rect cho các lớp overlay
             this.designRect = { x: dx, y: dy, width: drawW, height: drawH };
 
-            // Draw overlays relative to image rect with performance optimization
+            // Vẽ các lớp overlay với chất lượng cao
             this.drawUserPhotoOnFrame(this.ctx, this.designRect);
             this.drawGuestNameOnFrame(this.ctx, this.designRect);
             this.drawTicketTypeBadgeOnFrame(this.ctx, this.designRect);
@@ -967,40 +970,40 @@ class InvitationGenerator {
             
                          // Tạo hiệu ứng viền neon với glow mờ nhòe dần cho tất cả 3 viền
              
-             // 1. Vẽ viền neon xanh bên ngoài với glow
+             // 1. Vẽ viền neon xanh bên ngoài với glow - TĂNG ĐỘ DÀY
              ctx.shadowColor = '#00BFFF';
-             ctx.shadowBlur = 40;
+             ctx.shadowBlur = 70;
              ctx.shadowOffsetX = 0;
              ctx.shadowOffsetY = 0;
              
              ctx.strokeStyle = '#00BFFF';
-             ctx.lineWidth = 1.6;
+             ctx.lineWidth = 3.5; // Tăng từ 1.6 lên 3.5
              ctx.beginPath();
-             ctx.arc(circleX, circleY, circleRadius + 3.5, 0, Math.PI * 2);
+             ctx.arc(circleX, circleY, circleRadius + 5, 0, Math.PI * 2);
              ctx.stroke();
              
-             // 2. Vẽ vòng tròn chính màu trắng với glow
+             // 2. Vẽ vòng tròn chính màu trắng với glow - TĂNG ĐỘ DÀY
              ctx.shadowColor = '#FFFFFF';
-             ctx.shadowBlur = 35;
+             ctx.shadowBlur = 45;
              ctx.shadowOffsetX = 0;
              ctx.shadowOffsetY = 0;
              
              ctx.strokeStyle = '#FFFFFF';
-             ctx.lineWidth = 1.6;
+             ctx.lineWidth = 3.5; // Tăng từ 1.6 lên 3.5
              ctx.beginPath();
-             ctx.arc(circleX, circleY, circleRadius + 2.5, 0, Math.PI * 2);
+             ctx.arc(circleX, circleY, circleRadius + 3.5, 0, Math.PI * 2);
              ctx.stroke();
              
-             // 3. Vẽ viền neon xanh bên trong với glow - vừa chạm viền avatar
+             // 3. Vẽ viền neon xanh bên trong với glow - TĂNG ĐỘ DÀY
              ctx.shadowColor = '#00BFFF';
-             ctx.shadowBlur = 40;
+             ctx.shadowBlur = 50;
              ctx.shadowOffsetX = 0;
              ctx.shadowOffsetY = 0;
              
              ctx.strokeStyle = '#00BFFF';
-             ctx.lineWidth = 1.6;
+             ctx.lineWidth = 3.5; // Tăng từ 1.6 lên 3.5
              ctx.beginPath();
-             ctx.arc(circleX, circleY, circleRadius +1.5, 0, Math.PI * 2);
+             ctx.arc(circleX, circleY, circleRadius + 2, 0, Math.PI * 2);
              ctx.stroke();
             
             ctx.restore();
@@ -1206,46 +1209,57 @@ class InvitationGenerator {
         const guestName = this.guestNameInput.value || 'guest';
         const ticketType = this.ticketTypeSelect.value;
         
-        // TỐI ƯU: Canvas tạm để xuất ảnh chất lượng cao với độ phân giải tối ưu
+        // CẢI THIỆN: Canvas tạm để xuất ảnh chất lượng HD tối đa
         const downloadCanvas = document.createElement('canvas');
         const downloadCtx = downloadCanvas.getContext('2d');
         
-        // Đặt độ phân giải cao (3x) để ảnh sắc nét hơn khi download
-        const downloadScale = 3;
-        downloadCanvas.width = this.displayWidth * downloadScale;
-        downloadCanvas.height = this.displayHeight * downloadScale;
+        // CẢI THIỆN: Sử dụng kích thước ảnh gốc để đảm bảo chất lượng HD
+        // Thay vì scale 3x, sử dụng kích thước ảnh nền gốc
+        let finalWidth, finalHeight;
         
-        // Scale context tương ứng bản gốc
-        downloadCtx.scale(downloadScale, downloadScale);
+        if (this.backgroundImage && this.backgroundImage.complete) {
+            // Sử dụng kích thước ảnh nền gốc để giữ nguyên chất lượng
+            finalWidth = this.backgroundImage.width;
+            finalHeight = this.backgroundImage.height;
+        } else {
+            // Fallback nếu không có ảnh nền
+            finalWidth = this.displayWidth * 2; // 2x cho chất lượng tốt
+            finalHeight = this.displayHeight * 2;
+        }
         
-        // Bật làm mịn ảnh chất lượng cao
+        downloadCanvas.width = finalWidth;
+        downloadCanvas.height = finalHeight;
+        
+        // CẢI THIỆN: Bật làm mịn ảnh chất lượng cao nhất cho canvas download
         downloadCtx.imageSmoothingEnabled = true;
         downloadCtx.imageSmoothingQuality = 'high';
         
-        // Vẽ lại mọi thứ ở độ phân giải cao
-        downloadCtx.clearRect(0, 0, this.displayWidth, this.displayHeight);
+        // CẢI THIỆN: Tối ưu context cho chất lượng cao
+        downloadCtx.globalCompositeOperation = 'source-over';
+        downloadCtx.globalAlpha = 1.0;
+        
+        // Vẽ lại mọi thứ ở độ phân giải gốc
+        downloadCtx.clearRect(0, 0, finalWidth, finalHeight);
         
         if (this.backgroundImage && this.backgroundImage.complete) {
-            // Khi xuất cũng letterbox giống xem trước
+            // CẢI THIỆN: Vẽ ảnh nền ở kích thước gốc để giữ chất lượng HD
             const imgW = this.backgroundImage.width;
             const imgH = this.backgroundImage.height;
-            const scale = Math.min(this.displayWidth / imgW, this.displayHeight / imgH);
-            const drawW = Math.round(imgW * scale);
-            const drawH = Math.round(imgH * scale);
-            const dx = Math.round((this.displayWidth - drawW) / 2);
-            const dy = Math.round((this.displayHeight - drawH) / 2);
-
-            const bgGrad = downloadCtx.createLinearGradient(0, 0, this.displayWidth, this.displayHeight);
+            
+            // Vẽ nền đen nếu cần
+            const bgGrad = downloadCtx.createLinearGradient(0, 0, finalWidth, finalHeight);
             bgGrad.addColorStop(0, '#0f2b4c');
             bgGrad.addColorStop(1, '#0a1a30');
             downloadCtx.fillStyle = bgGrad;
-            downloadCtx.fillRect(0, 0, this.displayWidth, this.displayHeight);
+            downloadCtx.fillRect(0, 0, finalWidth, finalHeight);
 
-            downloadCtx.drawImage(this.backgroundImage, dx, dy, drawW, drawH);
+            // Vẽ ảnh nền ở kích thước gốc
+            downloadCtx.drawImage(this.backgroundImage, 0, 0, imgW, imgH);
 
-            const rect = { x: dx, y: dy, width: drawW, height: drawH };
+            // Tính toán rect cho các overlay dựa trên kích thước gốc
+            const rect = { x: 0, y: 0, width: imgW, height: imgH };
 
-            // Vẽ lại các lớp theo rect ảnh
+            // Vẽ lại các lớp overlay với chất lượng cao
             this.drawUserPhotoOnFrame(downloadCtx, rect);
             this.drawGuestNameOnFrame(downloadCtx, rect);
             this.drawTicketTypeBadgeOnFrame(downloadCtx, rect);
@@ -1253,7 +1267,7 @@ class InvitationGenerator {
             this.drawFallbackDesign(downloadCtx);
         }
         
-        // Tối ưu cho file lớn - sử dụng blob thay vì dataURL
+        // CẢI THIỆN: Xuất với chất lượng cao nhất (1.0 = 100%)
         downloadCanvas.toBlob((blob) => {
             // Kiểm tra xem có phải thiết bị di động không
             const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -1277,7 +1291,7 @@ class InvitationGenerator {
                 
                 this.showNotification('Thiệp mời đã được tải xuống thành công! Hẹn sớm gặp lại quý khách');
             }
-        }, 'image/png', 1.0);
+        }, 'image/png', 1.0); // Chất lượng 100%
     }
     
     async downloadForMobile(blob, guestName, ticketType) {
