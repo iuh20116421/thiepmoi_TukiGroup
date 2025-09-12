@@ -1083,11 +1083,11 @@ class InvitationGenerator {
             nameY = nameMaxY;
         }
         
-        // Vẽ tên khách mời
+        // Vẽ tên khách mời với font serif đẹp
         const scale = rect.width / 650;
         const fontSize = Math.max(14, Math.round(18 * scale));
         ctx.fillStyle = '#FFFFFF';
-        ctx.font = `bold ${fontSize}px Arial`;
+        ctx.font = `bold ${fontSize}px 'Times New Roman', 'Georgia', 'Playfair Display', serif`;
         ctx.textAlign = 'center';
         ctx.fillText(guestName, nameX, nameY);
         
