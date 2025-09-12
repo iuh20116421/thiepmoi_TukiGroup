@@ -494,18 +494,18 @@ class InvitationGenerator {
         cropCtx.shadowColor = 'transparent';
         cropCtx.shadowBlur = 0;
         
-        // Vẽ viền phát sáng chính - TĂNG ĐỘ DÀY
+        // Vẽ viền phát sáng chính - ĐỘ DÀY LỚN
         cropCtx.strokeStyle = '#00BFFF';
-        cropCtx.lineWidth = 6; // Tăng từ 4 lên 6
+        cropCtx.lineWidth = 10; // Tăng lên 10px để giống code mẫu
         cropCtx.beginPath();
         cropCtx.arc(centerX, centerY, radius, 0, Math.PI * 2);
         cropCtx.stroke();
         
-        // Thêm hiệu ứng sáng bên trong - TĂNG ĐỘ DÀY
+        // Thêm hiệu ứng sáng bên trong - ĐỘ DÀY LỚN
         cropCtx.strokeStyle = 'rgba(0, 191, 255, 0.6)';
-        cropCtx.lineWidth = 4; // Tăng từ 2 lên 4
+        cropCtx.lineWidth = 6; // Tăng lên 6px
         cropCtx.beginPath();
-        cropCtx.arc(centerX, centerY, radius - 3, 0, Math.PI * 2);
+        cropCtx.arc(centerX, centerY, radius - 5, 0, Math.PI * 2);
         cropCtx.stroke();
         
         cropCtx.restore();
@@ -617,18 +617,18 @@ class InvitationGenerator {
          finalCtx.shadowColor = 'transparent';
          finalCtx.shadowBlur = 0;
          
-         // Vẽ viền sáng chính với độ dày tăng - TĂNG ĐỘ DÀY
+         // Vẽ viền sáng chính với độ dày lớn - ĐỘ DÀY LỚN
          finalCtx.strokeStyle = '#00BFFF';
-         finalCtx.lineWidth = 8; // Tăng từ 4 lên 8
+         finalCtx.lineWidth = 12; // Tăng lên 12px để giống code mẫu
          finalCtx.beginPath();
          finalCtx.arc(centerX, centerY, radius, 0, Math.PI * 2);
          finalCtx.stroke();
          
-         // Thêm viền sáng bên trong để tăng độ sâu - TĂNG ĐỘ DÀY
+         // Thêm viền sáng bên trong để tăng độ sâu - ĐỘ DÀY LỚN
          finalCtx.strokeStyle = 'rgba(0, 191, 255, 0.7)';
-         finalCtx.lineWidth = 5; // Tăng từ 2 lên 5
+         finalCtx.lineWidth = 8; // Tăng lên 8px
          finalCtx.beginPath();
-         finalCtx.arc(centerX, centerY, radius - 2, 0, Math.PI * 2);
+         finalCtx.arc(centerX, centerY, radius - 4, 0, Math.PI * 2);
          finalCtx.stroke();
         
         finalCtx.restore();
@@ -970,38 +970,38 @@ class InvitationGenerator {
             
                          // Tạo hiệu ứng viền neon với glow mờ nhòe dần cho tất cả 3 viền
              
-             // 1. Vẽ viền neon xanh bên ngoài với glow - TĂNG ĐỘ DÀY
+             // 1. Vẽ viền neon xanh bên ngoài với glow - ĐỘ DÀY LỚN
+             ctx.shadowColor = '#00BFFF';
+             ctx.shadowBlur = 80;
+             ctx.shadowOffsetX = 0;
+             ctx.shadowOffsetY = 0;
+             
+             ctx.strokeStyle = '#00BFFF';
+             ctx.lineWidth = 8; // Tăng lên 8px để giống code mẫu
+             ctx.beginPath();
+             ctx.arc(circleX, circleY, circleRadius + 8, 0, Math.PI * 2);
+             ctx.stroke();
+             
+             // 2. Vẽ vòng tròn chính màu trắng với glow - ĐỘ DÀY LỚN
+             ctx.shadowColor = '#FFFFFF';
+             ctx.shadowBlur = 60;
+             ctx.shadowOffsetX = 0;
+             ctx.shadowOffsetY = 0;
+             
+             ctx.strokeStyle = '#FFFFFF';
+             ctx.lineWidth = 6; // Tăng lên 6px
+             ctx.beginPath();
+             ctx.arc(circleX, circleY, circleRadius + 5, 0, Math.PI * 2);
+             ctx.stroke();
+             
+             // 3. Vẽ viền neon xanh bên trong với glow - ĐỘ DÀY LỚN
              ctx.shadowColor = '#00BFFF';
              ctx.shadowBlur = 70;
              ctx.shadowOffsetX = 0;
              ctx.shadowOffsetY = 0;
              
              ctx.strokeStyle = '#00BFFF';
-             ctx.lineWidth = 3.5; // Tăng từ 1.6 lên 3.5
-             ctx.beginPath();
-             ctx.arc(circleX, circleY, circleRadius + 5, 0, Math.PI * 2);
-             ctx.stroke();
-             
-             // 2. Vẽ vòng tròn chính màu trắng với glow - TĂNG ĐỘ DÀY
-             ctx.shadowColor = '#FFFFFF';
-             ctx.shadowBlur = 45;
-             ctx.shadowOffsetX = 0;
-             ctx.shadowOffsetY = 0;
-             
-             ctx.strokeStyle = '#FFFFFF';
-             ctx.lineWidth = 3.5; // Tăng từ 1.6 lên 3.5
-             ctx.beginPath();
-             ctx.arc(circleX, circleY, circleRadius + 3.5, 0, Math.PI * 2);
-             ctx.stroke();
-             
-             // 3. Vẽ viền neon xanh bên trong với glow - TĂNG ĐỘ DÀY
-             ctx.shadowColor = '#00BFFF';
-             ctx.shadowBlur = 50;
-             ctx.shadowOffsetX = 0;
-             ctx.shadowOffsetY = 0;
-             
-             ctx.strokeStyle = '#00BFFF';
-             ctx.lineWidth = 3.5; // Tăng từ 1.6 lên 3.5
+             ctx.lineWidth = 5; // Tăng lên 5px
              ctx.beginPath();
              ctx.arc(circleX, circleY, circleRadius + 2, 0, Math.PI * 2);
              ctx.stroke();
